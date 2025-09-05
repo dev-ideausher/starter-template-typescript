@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
 import { AuthRequest } from "../middlewares";
 import { UserService } from "../services";
-import { asyncHandler } from "../utils";
+import { ApiResponse, asyncHandler } from "../utils";
 
 export class UserController {
     static completeProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -16,15 +16,17 @@ export class UserController {
             avatarLocalPath,
         });
 
-        res.status(200).json({
-            success: true,
-            message: "Profile completed successfully",
-            data: {
-                user,
-                access_token,
-                refresh_token,
-            },
-        });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    user,
+                    access_token,
+                    refresh_token,
+                },
+                "Profile completed successfully"
+            )
+        );
     });
 
     static editProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -39,13 +41,7 @@ export class UserController {
             avatarLocalPath,
         });
 
-        res.status(200).json({
-            success: true,
-            message: "Profile updated successfully",
-            data: {
-                user,
-            },
-        });
+        res.status(200).json(new ApiResponse(200, user, "Profile updated successfully"));
     });
 
     static getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -53,21 +49,7 @@ export class UserController {
 
         await UserService.checkProfileComplete(user);
 
-        res.status(200).json({
-            success: true,
-            data: {
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    name: user.name,
-                    username: user.username,
-                    avatar: user.avatar,
-                    isEmailVerified: user.isEmailVerified,
-                    isProfileComplete: user.isProfileComplete,
-                    providers: user.providers,
-                },
-            },
-        });
+        res.status(200).json(new ApiResponse(200, user, "User Profile fetched successfully"));
     });
 
     static checkUsername = asyncHandler(async (req: Request, res: Response) => {
@@ -75,11 +57,14 @@ export class UserController {
 
         const userExits = await UserService.checkIfUsernameExists(username);
 
-        res.status(200).json({
-            success: true,
-            data: {
-                available: !userExits,
-            },
-        });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    available: !userExits,
+                },
+                "Username availablility checked successfully"
+            )
+        );
     });
 }

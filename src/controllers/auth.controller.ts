@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services";
-import { ApiError, asyncHandler, JWTUtils } from "../utils";
+import { ApiError, ApiResponse, asyncHandler, JWTUtils } from "../utils";
 
 export class AuthController {
     static sendVerificationEmail = asyncHandler(async (req: Request, res: Response) => {
@@ -8,10 +8,7 @@ export class AuthController {
 
         await AuthService.sendVerificationEmail(email);
 
-        res.status(200).json({
-            success: true,
-            message: "Verification email sent successfully",
-        });
+        res.status(200).json(new ApiResponse(200, {}, "Email verification sent successfully"));
     });
 
     static verifyEmail = asyncHandler(async (req: Request, res: Response) => {
@@ -19,15 +16,17 @@ export class AuthController {
 
         const { user, access_token, refresh_token } = await AuthService.verifyEmail(email, code);
 
-        res.status(200).json({
-            success: true,
-            message: "Email verified successfully. Please complete your profile.",
-            data: {
-                access_token,
-                refresh_token,
-                requiresProfileCompletion: !user.isProfileComplete,
-            },
-        });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    access_token,
+                    refresh_token,
+                    requiresProfileCompletion: !user.isProfileComplete,
+                },
+                "Email verified successfully. Please complete your profile."
+            )
+        );
     });
 
     static googleOAuth = asyncHandler(async (req: Request, res: Response) => {
@@ -35,15 +34,17 @@ export class AuthController {
 
         const { user, access_token, refresh_token } = await AuthService.googleOAuth(idToken);
 
-        res.status(200).json({
-            success: true,
-            message: "Google authentication successfull",
-            data: {
-                access_token,
-                refresh_token,
-                requiresProfileCompletion: !user.isProfileComplete,
-            },
-        });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    access_token,
+                    refresh_token,
+                    requiresProfileCompletion: !user.isProfileComplete,
+                },
+                "Google authentication successfull"
+            )
+        );
     });
 
     static appleOAuth = asyncHandler(async (req: Request, res: Response) => {
@@ -54,15 +55,17 @@ export class AuthController {
             userInfo
         );
 
-        res.status(200).json({
-            success: true,
-            message: "Apple authentication successfull",
-            data: {
-                access_token,
-                refresh_token,
-                requiresProfileCompletion: !user.isProfileComplete,
-            },
-        });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    access_token,
+                    refresh_token,
+                    requiresProfileCompletion: !user.isProfileComplete,
+                },
+                "Apple authentication successfull"
+            )
+        );
     });
 
     static refreshTokens = asyncHandler(async (req: Request, res: Response) => {
@@ -81,6 +84,14 @@ export class AuthController {
             id: user.id.toString(),
             email: user.email,
         });
-        return res.status(200).json({ access_token, refreshToken });
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { access_token, refreshToken },
+                    "Tokens refreshed successfully"
+                )
+            );
     });
 }
