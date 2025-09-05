@@ -1,0 +1,86 @@
+import { Request, Response } from "express";
+import { AuthService } from "../services";
+import { ApiError, asyncHandler, JWTUtils } from "../utils";
+
+export class AuthController {
+    static sendVerificationEmail = asyncHandler(async (req: Request, res: Response) => {
+        const { email } = req.body;
+
+        await AuthService.sendVerificationEmail(email);
+
+        res.status(200).json({
+            success: true,
+            message: "Verification email sent successfully",
+        });
+    });
+
+    static verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+        const { email, code } = req.body;
+
+        const { user, access_token, refresh_token } = await AuthService.verifyEmail(email, code);
+
+        res.status(200).json({
+            success: true,
+            message: "Email verified successfully. Please complete your profile.",
+            data: {
+                access_token,
+                refresh_token,
+                requiresProfileCompletion: !user.isProfileComplete,
+            },
+        });
+    });
+
+    static googleOAuth = asyncHandler(async (req: Request, res: Response) => {
+        const { idToken } = req.body;
+
+        const { user, access_token, refresh_token } = await AuthService.googleOAuth(idToken);
+
+        res.status(200).json({
+            success: true,
+            message: "Google authentication successfull",
+            data: {
+                access_token,
+                refresh_token,
+                requiresProfileCompletion: !user.isProfileComplete,
+            },
+        });
+    });
+
+    static appleOAuth = asyncHandler(async (req: Request, res: Response) => {
+        const { idToken, user: userInfo } = req.body;
+
+        const { access_token, refresh_token, user } = await AuthService.appleOAuth(
+            idToken,
+            userInfo
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Apple authentication successfull",
+            data: {
+                access_token,
+                refresh_token,
+                requiresProfileCompletion: !user.isProfileComplete,
+            },
+        });
+    });
+
+    static refreshTokens = asyncHandler(async (req: Request, res: Response) => {
+        const { refreshToken } = req.body;
+
+        const user = JWTUtils.verifyRefreshToken(refreshToken);
+        if (!user) {
+            throw new ApiError(401, "Refresh token expired. Please login again.");
+        }
+
+        const access_token = JWTUtils.generateAccessToken({
+            id: user.id.toString(),
+            email: user.email,
+        });
+        const refresh_token = JWTUtils.generateRefreshToken({
+            id: user.id.toString(),
+            email: user.email,
+        });
+        return res.status(200).json({ access_token, refreshToken });
+    });
+}

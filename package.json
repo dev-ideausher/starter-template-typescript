@@ -1,0 +1,52 @@
+{
+    "name": "starter-template-typescript",
+    "version": "1.0.0",
+    "description": "This is a TypeScript starter template for building backend applications with Express.",
+    "main": "dist/server.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "dev": "nodemon --ext ts --exec ts-node src/server.ts",
+        "watch": "tsc -w"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.879.0",
+        "apple-signin-auth": "^1.7.5",
+        "bcryptjs": "^2.4.3",
+        "cloudinary": "^2.7.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "express-rate-limit": "^6.8.1",
+        "firebase-admin": "^11.10.1",
+        "google-auth-library": "^9.0.0",
+        "helmet": "^7.0.0",
+        "joi": "^17.9.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^7.5.0",
+        "multer": "^2.0.2",
+        "nodemailer": "^6.9.4"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.2",
+        "@types/cors": "^2.8.13",
+        "@types/express": "^4.17.17",
+        "@types/jsonwebtoken": "^9.0.2",
+        "@types/multer": "^2.0.0",
+        "@types/node": "^20.5.0",
+        "@types/nodemailer": "^6.4.9",
+        "@typescript-eslint/eslint-plugin": "^6.4.0",
+        "@typescript-eslint/parser": "^6.4.0",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.1.6"
+    },
+    "keywords": [
+        "express",
+        "typescript",
+        "node"
+    ],
+    "author": "Abhay Pratap Yadav",
+    "license": "MIT"
+}
+
