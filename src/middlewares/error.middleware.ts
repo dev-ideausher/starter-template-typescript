@@ -25,6 +25,7 @@ const errorHandler: ErrorRequestHandler = (
 
     const response = {
         statusCode: error.statusCode,
+        success: false,
         message: error.message,
         ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}),
     };

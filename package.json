@@ -7,7 +7,9 @@
         "build": "tsc",
         "start": "node dist/server.js",
         "dev": "nodemon --ext ts --exec ts-node src/server.ts",
-        "watch": "tsc -w"
+        "watch": "tsc -w",
+        "generate": "ts-node src/scripts/generate-api.ts",
+        "remove": "ts-node src/scripts/remove-api.ts"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.879.0",
@@ -21,6 +23,7 @@
         "firebase-admin": "^11.10.1",
         "google-auth-library": "^9.0.0",
         "helmet": "^7.0.0",
+        "http-status": "^2.1.0",
         "joi": "^17.9.2",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^7.5.0",
