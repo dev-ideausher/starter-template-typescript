@@ -1,19 +1,19 @@
 import { Router } from "express";
 import { AuthController } from "../controllers";
 import { validate } from "../middlewares";
-import { AuthSchemas } from "../validators";
+import { AuthSchema } from "../validators";
 
 const router = Router();
 
 // Public routes
-// router.post(
-//     "/send-verification",
-//     validate(AuthSchemas.sendVerification),
-//     AuthController.sendVerificationEmail
-// );
-// router.post("/verify-email", validate(AuthSchemas.emailVerification), AuthController.verifyEmail);
-// router.post("/oauth/google", validate(AuthSchemas.googleOAuth), AuthController.googleOAuth);
-// router.post("/oauth/apple", validate(AuthSchemas.appleOAuth), AuthController.appleOAuth);
-// router.post("/refresh-tokens", validate(AuthSchemas.refreshTokens), AuthController.refreshTokens);
+router.post(
+    "/send-verification",
+    validate(AuthSchema.sendVerification),
+    AuthController.sendVerificationEmail
+);
+router.post("/verify-email", validate(AuthSchema.emailVerification), AuthController.verifyEmail);
+router.post("/oauth/google", validate(AuthSchema.googleOAuth), AuthController.googleOAuth);
+router.post("/oauth/apple", validate(AuthSchema.appleOAuth), AuthController.appleOAuth);
+router.post("/refresh-tokens", validate(AuthSchema.refreshTokens), AuthController.refreshTokens);
 
 export default router;

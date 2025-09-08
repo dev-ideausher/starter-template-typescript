@@ -44,7 +44,9 @@ export const validate =
             .prefs({ errors: { label: "key" } })
             .validate(object);
 
-        console.log("🚀 ~ validate ~ error:", req.body, req.files, error);
+        if (error) {
+            console.log("🚀 ~ validate ~ error:", req.body, req.files, error);
+        }
 
         // If validation fails, throw 400 Bad Request error
         if (error) {

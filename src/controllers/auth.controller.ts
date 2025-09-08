@@ -71,25 +71,13 @@ export class AuthController {
     static refreshTokens = asyncHandler(async (req: Request, res: Response) => {
         const { refreshToken } = req.body;
 
-        const user = JWTUtils.verifyRefreshToken(refreshToken);
-        if (!user) {
-            throw new ApiError(401, "Refresh token expired. Please login again.");
-        }
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user.id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user.id.toString(),
-            email: user.email,
-        });
+        const { access_token, refresh_token } = await AuthService.refreshToken(refreshToken);
         return res
             .status(200)
             .json(
                 new ApiResponse(
                     200,
-                    { access_token, refreshToken },
+                    { access_token, refresh_token },
                     "Tokens refreshed successfully"
                 )
             );

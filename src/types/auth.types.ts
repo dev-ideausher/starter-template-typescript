@@ -26,3 +26,8 @@ export interface AuthResponse {
     refresh_token: string;
     user: IUser;
 }
+
+export interface RefreshTokenResponse {
+    access_token: string;
+    refresh_token: string;
+}

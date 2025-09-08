@@ -1,4 +1,10 @@
-import { GoogleTokenPayload, AppleTokenPayload, EmailVerificationData } from "./auth.types";
+import {
+    GoogleTokenPayload,
+    AppleTokenPayload,
+    EmailVerificationData,
+    RefreshTokenResponse,
+    AuthResponse,
+} from "./auth.types";
 import { Avatar, CompleteProfileData, EditProfileData } from "./user.types";
 
 interface JWTPayload {
@@ -9,9 +15,11 @@ interface JWTPayload {
 export {
     Avatar,
     JWTPayload,
+    AuthResponse,
     GoogleTokenPayload,
     AppleTokenPayload,
     EditProfileData,
     EmailVerificationData,
     CompleteProfileData,
+    RefreshTokenResponse,
 };

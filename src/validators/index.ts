@@ -1,4 +1,4 @@
-import { AuthSchemas } from "./auth.validator";
+import { AuthSchema } from "./auth.validator";
 import { UserSchemas } from "./user.validator";
 
-export { AuthSchemas, UserSchemas };
+export { AuthSchema, UserSchemas };
