@@ -1,3 +1,3 @@
-import { UserRepository } from "./auth.repositories";
+import { UserRepository } from "./user.repositories";
 
 export { UserRepository };
