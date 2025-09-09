@@ -7,6 +7,7 @@ import {
     SendEmailRequest,
     OAuthRequest,
     RefreshTokensRequest,
+    RegisterRequest,
 } from "./auth.types";
 import { Avatar, CompleteProfileData, EditProfileData } from "./user.types";
 
@@ -28,4 +29,5 @@ export {
     SendEmailRequest,
     OAuthRequest,
     RefreshTokensRequest,
+    RegisterRequest,
 };

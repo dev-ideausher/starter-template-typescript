@@ -33,7 +33,7 @@ app.use(hpp());
 // Gzip compression
 app.use(compression());
 
-if (config.nodeEnv !== "test") {
+if (config.nodeEnv !== "development") {
     app.use(successLogger);
     app.use(errorLogger);
 }

@@ -37,4 +37,11 @@ export const AuthSchema = {
             refreshToken: Joi.string().required(),
         }),
     },
+
+    register: {
+        body: Joi.object({
+            name: Joi.string().required(),
+            username: Joi.string().required(),
+        }),
+    },
 };

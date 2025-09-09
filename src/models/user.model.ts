@@ -18,8 +18,25 @@ export interface IUser extends Document {
             email: string;
         };
     };
+    firebaseUid: string;
+    firebaseSignInProvider: string;
     createdAt: Date;
     updatedAt: Date;
+    __t: string;
+}
+
+export interface IClient extends IUser {
+    isBlocked: boolean;
+    isDeleted: boolean;
+    preferences: {
+        notificationEnabled: boolean;
+        locationShared: boolean;
+    };
+}
+
+export interface IAdmin extends IUser {
+    permissions: string[];
+    superAdmin: boolean;
 }
 
 const userSchema = new Schema<IUser>(
@@ -53,23 +70,61 @@ const userSchema = new Schema<IUser>(
             type: Boolean,
             default: false,
         },
-        providers: {
-            google: {
-                id: String,
-                email: String,
+        firebaseUid: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        firebaseSignInProvider: {
+            type: String,
+            required: true,
+        },
+    },
+    { timestamps: true }
+);
+
+const clientSchema = new Schema<IClient>(
+    {
+        isBlocked: {
+            type: Boolean,
+            default: false,
+        },
+        isDeleted: {
+            // to soft delete user. if(isDeleted = true), then user is deleted.
+            type: Boolean,
+            default: false,
+        },
+        preferences: {
+            type: {
+                notificationEnabled: Boolean,
+                locationShared: Boolean,
             },
-            apple: {
-                id: String,
-                email: String,
+            default: {
+                notificationEnabled: false,
+                locationShared: false,
             },
         },
     },
+    { timestamps: true }
+);
+
+const adminSchema = new Schema<IAdmin>(
     {
-        timestamps: true,
-    }
+        permissions: {
+            type: [String],
+            default: [],
+        },
+        superAdmin: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    { timestamps: true }
 );
 
 // Index for username uniqueness
 userSchema.index({ username: 1 }, { unique: true, sparse: true });
 
 export const User = model<IUser>("User", userSchema);
+export const Client = User.discriminator<IClient>("Client", clientSchema);
+export const Admin = User.discriminator<IAdmin>("Admin", adminSchema);

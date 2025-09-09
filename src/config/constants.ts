@@ -1,7 +1,7 @@
 export const userTypes = {
     ALL: "All",
-    ADMIN: "ADMIN",
-    CLIENT: "CLIENT",
+    ADMIN: "Admin",
+    CLIENT: "Client",
 };
 
 const imgTypeToExtension = {

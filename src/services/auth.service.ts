@@ -1,149 +1,42 @@
-import { EmailService, OAuthService } from "../microservices";
+import { admin, userTypes } from "../config";
+import { IUser } from "../models";
+import { IAdmin, IClient } from "../models/user.model";
 import { UserRepository } from "../repositories";
-import { AuthResponse, RefreshTokenResponse } from "../types";
-import { ApiError, JWTUtils } from "../utils";
+import { RegisterRequest } from "../types";
+
+const createNewUserObject = (newUser: admin.auth.DecodedIdToken) => ({
+    email: newUser.email,
+    firebaseUid: newUser.uid,
+    isEmailVerified: newUser.isEmailVerified,
+    firebaseSignInProvider: newUser.firebase.sign_in_provider,
+});
 
 export class AuthService {
-    static async sendVerificationEmail(email: string): Promise<void> {
-        const verificationCode = EmailService.generateVerificationCode();
-        await EmailService.storeVerificationCode(email, verificationCode);
-        await EmailService.sendVerificationEmail(email, verificationCode);
-    }
-
-    static async verifyEmail(email: string, code: string): Promise<AuthResponse> {
-        const isValid = await EmailService.verifyCode(email, code);
-        if (!isValid) throw new ApiError(400, "Invalid or expired verification code");
-
-        let user = await UserRepository.findOne({ email });
-
-        if (!user) {
-            user = await UserRepository.create({
-                email,
-                isEmailVerified: true,
-                isProfileComplete: false,
-            });
+    static async getUserByFirebaseUid(id: string): Promise<IClient | IAdmin | IUser | null> {
+        const user = await UserRepository.getUserByFirebaseUId(id);
+        if (!user) return null;
+        if (user.__t == "Client") {
+            return user as IClient;
+        } else if (user.__t == "Admin") {
+            return user as IAdmin;
         } else {
-            user.isEmailVerified = true;
-            user = await UserRepository.save(user);
+            return user as IUser;
         }
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        return { access_token, refresh_token, user };
     }
 
-    static async googleOAuth(idToken: string): Promise<AuthResponse> {
-        const payload = await OAuthService.verifyGoogleToken(idToken);
-
-        let user = await UserRepository.findOne({
-            $or: [{ email: payload.email }, { "providers.google.id": payload.sub }],
-        });
-
-        if (!user) {
-            user = await UserRepository.create({
-                email: payload.email,
-                isEmailVerified: payload.email_verified,
-                isProfileComplete: false,
-                providers: { google: { id: payload.sub, email: payload.email } },
-            });
+    static async register(
+        newUser: admin.auth.DecodedIdToken,
+        data: RegisterRequest,
+        routeType: string
+    ): Promise<IClient | IAdmin> {
+        const user: Partial<IUser> = {
+            ...createNewUserObject(newUser),
+            ...data,
+        };
+        if (routeType === userTypes.CLIENT) {
+            return UserRepository.createClient(user);
         } else {
-            user = await UserRepository.findOneAndUpdate(
-                { _id: user._id },
-                {
-                    $set: {
-                        "providers.google": { id: payload.sub, email: payload.email },
-                        ...(payload.email_verified ? { isEmailVerified: true } : {}),
-                    },
-                }
-            );
+            return UserRepository.createAdmin(user);
         }
-
-        if (!user) throw new ApiError(500, "Internal server error");
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        return { access_token, refresh_token, user };
-    }
-
-    static async appleOAuth(idToken: string): Promise<AuthResponse> {
-        const payload = await OAuthService.verifyAppleToken(idToken);
-
-        let user = await UserRepository.findOne({
-            $or: [{ email: payload.email }, { "providers.apple.id": payload.sub }],
-        });
-
-        if (!user) {
-            // Create new user with incomplete profile
-            user = await UserRepository.create({
-                email: payload.email || `${payload.sub}@privaterelay.appleid.com`,
-                isEmailVerified: payload.email_verified || false,
-                isProfileComplete: false,
-                providers: {
-                    apple: {
-                        id: payload.sub,
-                        email: payload.email || "",
-                    },
-                },
-            });
-            await user.save();
-        } else {
-            // Update existing user with Apple provider if not already linked
-            user = await UserRepository.findOneAndUpdate(
-                { _id: user._id },
-                {
-                    $set: {
-                        "providers.apple": {
-                            id: payload.sub,
-                            email: payload.email,
-                        },
-                        ...(payload.email_verified ? { isEmailVerified: true } : {}),
-                    },
-                }
-            );
-        }
-
-        if (!user) {
-            throw new ApiError(500, "Internal server error");
-        }
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        return { access_token, refresh_token, user };
-    }
-
-    static async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-        const user = JWTUtils.verifyRefreshToken(refreshToken);
-        if (!user) {
-            throw new ApiError(401, "Refresh token expired. Please login again.");
-        }
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user.id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user.id.toString(),
-            email: user.email,
-        });
-
-        return { access_token, refresh_token };
     }
 }

@@ -15,24 +15,6 @@ export interface AppleTokenPayload {
     email_verified?: boolean;
 }
 
-export interface EmailVerificationRequest {
-    email: string;
-    code: string;
-    expiresAt: Date;
-}
-
-export interface SendEmailRequest {
-    email: string;
-}
-
-export interface OAuthRequest {
-    idToken: string;
-}
-
-export interface RefreshTokensRequest {
-    refreshToken: string;
-}
-
 export interface AuthResponse {
     access_token: string;
     refresh_token: string;
@@ -42,4 +24,9 @@ export interface AuthResponse {
 export interface RefreshTokenResponse {
     access_token: string;
     refresh_token: string;
+}
+
+export interface RegisterRequest {
+    username: string;
+    name: string;
 }

@@ -1,4 +1,4 @@
-import { IUser, User } from "../models";
+import { Admin, Client, IAdmin, IClient, IUser, User } from "../models";
 import { FilterQuery, UpdateQuery } from "mongoose";
 
 export class UserRepository {
@@ -31,7 +31,15 @@ export class UserRepository {
         return user.save();
     }
 
-    static async save(user: IUser): Promise<IUser> {
-        return user.save();
+    static async getUserByFirebaseUId(id: string): Promise<IUser | null> {
+        return User.findOne({ firebaseUid: id });
+    }
+
+    static async createAdmin(user: Partial<IUser>): Promise<IAdmin> {
+        return Admin.create(user);
+    }
+
+    static async createClient(user: Partial<IUser>): Promise<IClient> {
+        return Client.create(user);
     }
 }

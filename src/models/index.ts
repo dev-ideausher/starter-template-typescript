@@ -1,4 +1,4 @@
-import { User, IUser } from "./user.model";
+import { User, IUser, Client, IClient, Admin, IAdmin } from "./user.model";
 import { EmailVerification, IEmailVerification } from "./email.model";
 
-export { User, IUser, EmailVerification, IEmailVerification };
+export { User, IUser, Client, IClient, Admin, IAdmin, EmailVerification, IEmailVerification };
