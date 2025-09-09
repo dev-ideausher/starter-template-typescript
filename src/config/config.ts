@@ -5,6 +5,7 @@ dotenv.config();
 
 const envSchema = Joi.object({
     PORT: Joi.number().default(8000),
+    CORS: Joi.string().default("*"),
     NODE_ENV: Joi.string().required(),
     MONGODB_URI: Joi.string().uri().required(),
     MONGODB_DBNAME: Joi.string().required(),
@@ -52,6 +53,7 @@ if (error) {
 const config = {
     port: envVars.PORT,
     nodeEnv: envVars.NODE_ENV,
+    cors: envVars.CORS,
     mongodb: {
         uri: envVars.MONGODB_URI,
         dbName: envVars.MONGODB_DBNAME,

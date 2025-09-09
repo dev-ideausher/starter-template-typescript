@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import app from "./app";
-import connectDB from "./config/db";
+import { connectDB } from "./config";
 
 dotenv.config();
 

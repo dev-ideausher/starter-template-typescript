@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { JWTPayload } from "../types";
-import config from "../config/config";
+import { config } from "../config";
 
 export class JWTUtils {
     static generateAccessToken = (payload: JWTPayload): string => {

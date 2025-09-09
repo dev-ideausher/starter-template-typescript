@@ -1,5 +1,5 @@
 import { CloudinaryService } from "../microservices";
-import { IUser, User } from "../models";
+import { IUser } from "../models";
 import { UserRepository } from "../repositories";
 import { Avatar, CompleteProfileData, EditProfileData } from "../types";
 import { AuthResponse } from "../types/auth.types";

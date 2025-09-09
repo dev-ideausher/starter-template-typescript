@@ -1,7 +1,7 @@
 import { OAuth2Client } from "google-auth-library";
 import appleSigninAuth from "apple-signin-auth";
 import { GoogleTokenPayload, AppleTokenPayload } from "../types";
-import config from "../config/config";
+import { config } from "../config";
 import { ApiError } from "../utils";
 
 export class OAuthService {

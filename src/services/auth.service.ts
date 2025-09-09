@@ -1,5 +1,4 @@
 import { EmailService, OAuthService } from "../microservices";
-import { IUser, User } from "../models";
 import { UserRepository } from "../repositories";
 import { AuthResponse, RefreshTokenResponse } from "../types";
 import { ApiError, JWTUtils } from "../utils";

@@ -13,27 +13,35 @@
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.879.0",
+        "@types/compression": "^1.8.1",
+        "@types/morgan": "^1.9.10",
         "apple-signin-auth": "^1.7.5",
         "bcryptjs": "^2.4.3",
         "cloudinary": "^2.7.0",
+        "compression": "^1.8.1",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
-        "express-rate-limit": "^6.8.1",
+        "express-rate-limit": "^6.11.2",
         "firebase-admin": "^11.10.1",
         "google-auth-library": "^9.0.0",
-        "helmet": "^7.0.0",
+        "helmet": "^7.2.0",
+        "hpp": "^0.2.3",
         "http-status": "^2.1.0",
         "joi": "^17.9.2",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^7.5.0",
+        "morgan": "^1.10.1",
         "multer": "^2.0.2",
-        "nodemailer": "^6.9.4"
+        "nodemailer": "^6.9.4",
+        "winston": "^3.17.0",
+        "xss-clean": "^0.1.4"
     },
     "devDependencies": {
         "@types/bcryptjs": "^2.4.2",
-        "@types/cors": "^2.8.13",
+        "@types/cors": "^2.8.19",
         "@types/express": "^4.17.17",
+        "@types/hpp": "^0.2.6",
         "@types/jsonwebtoken": "^9.0.2",
         "@types/multer": "^2.0.0",
         "@types/node": "^20.5.0",
@@ -52,4 +60,3 @@
     "author": "Abhay Pratap Yadav",
     "license": "MIT"
 }
-

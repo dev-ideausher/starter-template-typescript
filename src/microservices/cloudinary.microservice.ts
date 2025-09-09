@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import config from "../config/config";
+import { config } from "../config";
 
 interface CloudinaryResponse {
     url: string;
