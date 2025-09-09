@@ -1,120 +1,44 @@
-import { CloudinaryService } from "../microservices";
+import { S3Folders } from "../config";
+import { S3Service } from "../microservices";
 import { IUser } from "../models";
 import { UserRepository } from "../repositories";
-import { Avatar, CompleteProfileData, EditProfileData } from "../types";
-import { AuthResponse } from "../types/auth.types";
-import { ApiError, JWTUtils } from "../utils";
+import { UpdateUserRequest } from "../types/user.types";
+import { ApiError } from "../utils";
+import httpStatus from "http-status";
 
 export class UserService {
-    static async completeProfile(
-        userId: string,
-        profileData: CompleteProfileData
-    ): Promise<AuthResponse> {
-        const user = await UserRepository.findById(userId);
-        if (!user) throw new ApiError(404, "User not found");
-
-        // check username availability
-        if (profileData.username) {
-            const existingUsername = await UserRepository.findOne({
-                username: profileData.username,
-                _id: { $ne: userId },
-            });
-            if (existingUsername) throw new ApiError(400, "Username already taken");
-        }
-
-        // upload avatar if provided
-        let avatar: Avatar | null = null;
-        if (profileData.avatarLocalPath) {
-            const response = await CloudinaryService.uploadOnCloudinary(
-                profileData.avatarLocalPath
-            );
-            if (response) avatar = { id: response.id, url: response.url };
-        }
-
-        // prepare updates
-        const updates: Partial<CompleteProfileData> = {};
-        for (const [key, value] of Object.entries(profileData)) {
-            if (key === "avatarLocalFile") continue;
-            if (value !== undefined) (updates as any)[key] = value;
-        }
-        if (avatar) (updates as any).avatar = avatar;
-        (updates as any).isProfileComplete = true;
-
-        // delete old avatar if replaced
-        if (user.avatar) await CloudinaryService.deleteFromCloudinary(user.avatar.id);
-
-        // update in DB
-        const updatedUser = await UserRepository.findByIdAndUpdate(userId, updates, {
-            new: true,
-        });
-        if (!updatedUser) throw new ApiError(500, "Internal server error");
-
-        const access_token = JWTUtils.generateAccessToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-        const refresh_token = JWTUtils.generateRefreshToken({
-            id: user._id.toString(),
-            email: user.email,
-        });
-
-        return { access_token, refresh_token, user: updatedUser };
-    }
-
-    static async editProfile(
-        userId: string,
-        profileData: EditProfileData
-    ): Promise<{ user: IUser }> {
-        const user = await UserRepository.findById(userId);
-        if (!user) throw new ApiError(404, "User not found");
-
-        // check username availability
-        if (profileData.username) {
-            const existingUsername = await UserRepository.findOne({
-                username: profileData.username,
-                _id: { $ne: userId },
-            });
-            if (existingUsername) throw new ApiError(400, "Username already taken");
-        }
-
-        // upload avatar if provided
-        let avatar: Avatar | null = null;
-        if (profileData.avatarLocalPath) {
-            const response = await CloudinaryService.uploadOnCloudinary(
-                profileData.avatarLocalPath
-            );
-            if (response) avatar = { id: response.id, url: response.url };
-        }
-
-        // prepare updates
-        const updates: Partial<EditProfileData> = {};
-        for (const [key, value] of Object.entries(profileData)) {
-            if (key === "avatarLocalFile") continue;
-            if (value !== undefined) (updates as any)[key] = value;
-        }
-        if (avatar) (updates as any).avatar = avatar;
-        (updates as any).isProfileComplete = true;
-
-        if (user.avatar) await CloudinaryService.deleteFromCloudinary(user.avatar.id);
-
-        const updatedUser = await UserRepository.findByIdAndUpdate(userId, updates, { new: true });
-        if (!updatedUser) throw new ApiError(500, "Internal server error");
-
-        return { user: updatedUser };
-    }
-
-    static async getUserProfile(userId: string): Promise<IUser> {
-        const user = await UserRepository.findById(userId);
-        if (!user) throw new ApiError(404, "User not found");
-        return user;
-    }
-
-    static async checkProfileComplete(user: IUser): Promise<void> {
-        if (!user.isProfileComplete) throw new ApiError(400, "incomplete profile");
-    }
-
     static async checkIfUsernameExists(username: string): Promise<boolean> {
         const existingUsername = await UserRepository.findOne({ username });
-        return !!existingUsername;
+        return !existingUsername;
+    }
+
+    static async updateUser(
+        user: IUser,
+        payload: UpdateUserRequest,
+        profilePic: string | undefined
+    ): Promise<IUser> {
+        const existingUser = await UserRepository.findOne({ username: payload.username });
+        if (existingUser) {
+            throw new ApiError(httpStatus.CONFLICT, "Username not available");
+        }
+
+        let updates = { ...payload };
+        if (profilePic) {
+            const uploadedImage = await S3Service.uploadOnS3(S3Folders.profilePics, profilePic);
+
+            if (user.avatar) {
+                await S3Service.deleteFromS3(user.avatar.id);
+            }
+
+            if (uploadedImage) {
+                updates = { ...updates, ...uploadedImage };
+            }
+        }
+
+        const updatedUser = await UserRepository.findByIdAndUpdate(user._id, updates);
+        if (!updatedUser) {
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+        }
+        return updatedUser;
     }
 }

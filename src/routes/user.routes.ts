@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { UserController } from "../controllers";
-import { verifyJWT, validate, upload } from "../middlewares";
+import { validate, upload } from "../middlewares";
 import { UserSchema } from "../validators";
+import { firebaseAuth } from "../middlewares/firebase.middleware";
+import { userTypes } from "../config";
 
 const router = Router();
 
@@ -12,21 +14,11 @@ router.get(
 );
 
 router.patch(
-    "/complete-profile",
-    verifyJWT,
-    upload.single("avatar"),
-    validate(UserSchema.completeProfile),
-    UserController.completeProfile
-);
-
-router.patch(
-    "/edit-profile",
-    verifyJWT,
+    "/updateDetails",
+    firebaseAuth(userTypes.ALL),
     upload.single("avatar"),
     validate(UserSchema.editProfile),
-    UserController.editProfile
+    UserController.updateUser
 );
-
-router.get("/profile", verifyJWT, UserController.getProfile);
 
 export default router;

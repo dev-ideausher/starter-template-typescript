@@ -16,8 +16,8 @@ declare module "express-serve-static-core" {
 
 export interface AuthRequest<T = any, U extends ParsedQs = ParsedQs> extends Request {
     user?: IUser | IClient | IAdmin;
-    newUser: admin.auth.DecodedIdToken;
-    routeType: string;
+    newUser?: admin.auth.DecodedIdToken;
+    routeType?: string;
     body: T;
     query: U;
 }

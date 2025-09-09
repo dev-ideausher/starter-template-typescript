@@ -1,11 +1,13 @@
 import { Schema, model, Document } from "mongoose";
-import { Avatar } from "../types";
 
 export interface IUser extends Document {
     email: string;
     name?: string;
     username?: string;
-    avatar?: Avatar;
+    avatar?: {
+        id: string;
+        url: string;
+    };
     isEmailVerified: boolean;
     isProfileComplete: boolean;
     providers: {

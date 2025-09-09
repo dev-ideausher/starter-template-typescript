@@ -1,8 +1,11 @@
-import { admin, userTypes } from "../config";
+import { admin, S3Folders, userTypes } from "../config";
+import { S3Service } from "../microservices";
 import { IUser } from "../models";
 import { IAdmin, IClient } from "../models/user.model";
 import { UserRepository } from "../repositories";
 import { RegisterRequest } from "../types";
+import { ApiError } from "../utils";
+import httpStatus from "http-status";
 
 const createNewUserObject = (newUser: admin.auth.DecodedIdToken) => ({
     email: newUser.email,
@@ -26,13 +29,27 @@ export class AuthService {
 
     static async register(
         newUser: admin.auth.DecodedIdToken,
-        data: RegisterRequest,
-        routeType: string
+        payload: RegisterRequest,
+        routeType: string,
+        profilePic: string | undefined
     ): Promise<IClient | IAdmin> {
-        const user: Partial<IUser> = {
+        const existingUser = await UserRepository.findOne({ username: payload.username });
+        if (existingUser) {
+            throw new ApiError(httpStatus.CONFLICT, "Username not available");
+        }
+
+        let user: Partial<IUser> = {
             ...createNewUserObject(newUser),
-            ...data,
+            ...payload,
         };
+
+        if (profilePic) {
+            const uploadedImage = await S3Service.uploadOnS3(S3Folders.profilePics, profilePic);
+            if (uploadedImage) {
+                user = { ...user, ...uploadedImage };
+            }
+        }
+
         if (routeType === userTypes.CLIENT) {
             return UserRepository.createClient(user);
         } else {

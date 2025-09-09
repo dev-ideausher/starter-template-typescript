@@ -4,6 +4,10 @@ export const userTypes = {
     CLIENT: "Client",
 };
 
+export const S3Folders = {
+    profilePics: "profilePics",
+};
+
 const imgTypeToExtension = {
     "image/jpeg": "jpg",
     "image/png": "png",

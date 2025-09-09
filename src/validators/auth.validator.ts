@@ -1,47 +1,18 @@
 import Joi from "joi";
 
 export const AuthSchema = {
-    emailVerification: {
-        body: Joi.object({
-            email: Joi.string().email().required(),
-            code: Joi.string().length(6).required(),
-        }),
-    },
-
-    sendVerification: {
-        body: Joi.object({
-            email: Joi.string().email().required(),
-        }),
-    },
-
-    googleOAuth: {
-        body: Joi.object({
-            idToken: Joi.string().required(),
-        }),
-    },
-
-    appleOAuth: {
-        body: Joi.object({
-            idToken: Joi.string().required(),
-            user: Joi.object({
-                name: Joi.object({
-                    firstName: Joi.string(),
-                    lastName: Joi.string(),
-                }).optional(),
-            }).optional(),
-        }),
-    },
-
-    refreshTokens: {
-        body: Joi.object({
-            refreshToken: Joi.string().required(),
-        }),
-    },
-
     register: {
         body: Joi.object({
-            name: Joi.string().required(),
-            username: Joi.string().required(),
+            name: Joi.string().min(2).max(50).required(),
+            username: Joi.string()
+                .required()
+                .min(3)
+                .max(30)
+                .pattern(/^[a-zA-Z0-9_]+$/)
+                .messages({
+                    "string.pattern.base":
+                        "Username can only contain letters, numbers, and underscores",
+                }),
         }),
     },
 };

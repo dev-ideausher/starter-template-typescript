@@ -1,33 +1,9 @@
-import {
-    GoogleTokenPayload,
-    AppleTokenPayload,
-    EmailVerificationRequest,
-    RefreshTokenResponse,
-    AuthResponse,
-    SendEmailRequest,
-    OAuthRequest,
-    RefreshTokensRequest,
-    RegisterRequest,
-} from "./auth.types";
-import { Avatar, CompleteProfileData, EditProfileData } from "./user.types";
+import { GoogleTokenPayload, AppleTokenPayload, RegisterRequest } from "./auth.types";
+import { UpdateUserRequest } from "./user.types";
 
 interface JWTPayload {
     id: string;
     email: string;
 }
 
-export {
-    Avatar,
-    JWTPayload,
-    AuthResponse,
-    GoogleTokenPayload,
-    AppleTokenPayload,
-    EditProfileData,
-    EmailVerificationRequest,
-    CompleteProfileData,
-    RefreshTokenResponse,
-    SendEmailRequest,
-    OAuthRequest,
-    RefreshTokensRequest,
-    RegisterRequest,
-};
+export { UpdateUserRequest, JWTPayload, GoogleTokenPayload, AppleTokenPayload, RegisterRequest };
