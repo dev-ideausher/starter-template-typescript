@@ -1,9 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import { IUser, User } from "../models";
 import { JWTUtils } from "../utils";
+import { ParsedQs } from "qs";
 
-export interface AuthRequest extends Request {
+export interface AuthRequest<T = any, U extends ParsedQs = ParsedQs> extends Request {
     user?: IUser;
+    body: T;
+    query: U;
+}
+
+export interface CustomRequest<T = any, U extends ParsedQs = ParsedQs> extends Request {
+    user?: IUser;
+    body: T;
+    query: U;
 }
 
 export const verifyJWT = async (req: AuthRequest, res: Response, next: NextFunction) => {

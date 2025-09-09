@@ -2,34 +2,40 @@ import { Response, Request } from "express";
 import { AuthRequest } from "../middlewares";
 import { UserService } from "../services";
 import { ApiResponse, asyncHandler } from "../utils";
+import { CompleteProfileData, EditProfileData } from "../types";
 
 export class UserController {
-    static completeProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
-        const { name, username } = req.body;
-        const userId = req.user!._id.toString();
+    static completeProfile = asyncHandler(
+        async (req: AuthRequest<CompleteProfileData>, res: Response) => {
+            const { name, username } = req.body;
+            const userId = req.user!._id.toString();
 
-        const avatarLocalPath = req.file?.path;
+            const avatarLocalPath = req.file?.path;
 
-        const { user, access_token, refresh_token } = await UserService.completeProfile(userId, {
-            name,
-            username,
-            avatarLocalPath,
-        });
-
-        res.status(200).json(
-            new ApiResponse(
-                200,
+            const { user, access_token, refresh_token } = await UserService.completeProfile(
+                userId,
                 {
-                    user,
-                    access_token,
-                    refresh_token,
-                },
-                "Profile completed successfully"
-            )
-        );
-    });
+                    name,
+                    username,
+                    avatarLocalPath,
+                }
+            );
 
-    static editProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+            res.status(200).json(
+                new ApiResponse(
+                    200,
+                    {
+                        user,
+                        access_token,
+                        refresh_token,
+                    },
+                    "Profile completed successfully"
+                )
+            );
+        }
+    );
+
+    static editProfile = asyncHandler(async (req: AuthRequest<EditProfileData>, res: Response) => {
         const { name, username } = req.body;
         const userId = req.user!._id.toString();
 

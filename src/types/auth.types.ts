@@ -15,10 +15,22 @@ export interface AppleTokenPayload {
     email_verified?: boolean;
 }
 
-export interface EmailVerificationData {
+export interface EmailVerificationRequest {
     email: string;
     code: string;
     expiresAt: Date;
+}
+
+export interface SendEmailRequest {
+    email: string;
+}
+
+export interface OAuthRequest {
+    idToken: string;
+}
+
+export interface RefreshTokensRequest {
+    refreshToken: string;
 }
 
 export interface AuthResponse {

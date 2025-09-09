@@ -1,9 +1,12 @@
 import {
     GoogleTokenPayload,
     AppleTokenPayload,
-    EmailVerificationData,
+    EmailVerificationRequest,
     RefreshTokenResponse,
     AuthResponse,
+    SendEmailRequest,
+    OAuthRequest,
+    RefreshTokensRequest,
 } from "./auth.types";
 import { Avatar, CompleteProfileData, EditProfileData } from "./user.types";
 
@@ -19,7 +22,10 @@ export {
     GoogleTokenPayload,
     AppleTokenPayload,
     EditProfileData,
-    EmailVerificationData,
+    EmailVerificationRequest,
     CompleteProfileData,
     RefreshTokenResponse,
+    SendEmailRequest,
+    OAuthRequest,
+    RefreshTokensRequest,
 };
