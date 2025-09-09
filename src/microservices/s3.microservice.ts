@@ -1,11 +1,12 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import config from "../config/config";
+import { ApiError } from "../utils";
 
 interface S3Response {
     url: string;
-    id: string;
+    key: string;
 }
 
 const s3 = new S3Client({
@@ -16,59 +17,69 @@ const s3 = new S3Client({
     },
 });
 
+function generateKey(folder: string, fileName: string, visibility: boolean): string {
+    return `${visibility ? "private" : "public"}/${folder}/${fileName}`;
+}
+
 export class S3Service {
-    static uploadOnS3 = async (localFilePath: string): Promise<S3Response | null> => {
+    static uploadOnS3 = async (
+        localFilePath: string,
+        folder: string,
+        visibility: boolean = false
+    ): Promise<S3Response | null> => {
         try {
             if (!localFilePath) return null;
 
-            const fileContent = fs.readFileSync(localFilePath);
+            const fileContent = await fs.readFile(localFilePath);
             const fileName = path.basename(localFilePath);
             const bucket = config.aws.s3.bucket;
 
+            const key = generateKey(folder, fileName, visibility);
+
             const command = new PutObjectCommand({
                 Bucket: bucket,
-                Key: fileName,
+                Key: key,
                 Body: fileContent,
             });
 
             await s3.send(command);
 
-            fs.unlinkSync(localFilePath);
+            await fs.unlink(localFilePath);
 
             const result: S3Response = {
-                url: `https://${bucket}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${fileName}`,
-                id: fileName,
+                url: `https://${bucket}.s3.${config.aws.s3.region}.amazonaws.com/${key}`,
+                key,
             };
 
             console.log("File uploaded", result.url);
             return result;
         } catch (error) {
-            if (fs.existsSync(localFilePath)) {
-                fs.unlinkSync(localFilePath);
-            }
-            console.log("Error while uploading to S3", error);
-            return null;
+            try {
+                if (localFilePath) await fs.unlink(localFilePath);
+            } catch {}
+            console.error("Error while uploading to S3", error);
+            throw new ApiError(500, "Failed to upload file to S3");
         }
     };
 
-    static deleteFromS3 = async (id: string): Promise<any | null> => {
+    static deleteFromS3 = async (key: string): Promise<{ success: boolean }> => {
         try {
-            if (!id) return null;
+            if (!key) return { success: false };
 
             const bucket = config.aws.s3.bucket;
 
             const command = new DeleteObjectCommand({
                 Bucket: bucket,
-                Key: id,
+                Key: key,
             });
 
             await s3.send(command);
 
-            console.log("File deleted", id);
-            return { result: "ok", id };
+            console.log("File deleted", key);
+            return { success: true };
         } catch (error) {
-            console.log("Error deleting file from S3", error);
-            return null;
+            console.error("Error while deleting from S3", error);
+            return { success: false };
         }
     };
 }

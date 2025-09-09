@@ -78,10 +78,7 @@ export class AuthService {
         return { access_token, refresh_token, user };
     }
 
-    static async appleOAuth(
-        idToken: string,
-        userInfo?: { name: { firstName: string; lastName: string } }
-    ): Promise<AuthResponse> {
+    static async appleOAuth(idToken: string): Promise<AuthResponse> {
         const payload = await OAuthService.verifyAppleToken(idToken);
 
         let user = await UserRepository.findOne({
