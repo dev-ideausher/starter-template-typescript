@@ -4,7 +4,6 @@ import * as path from "path";
 // Get command line arguments
 const args = process.argv.slice(2);
 const routeName = args[0];
-const force = args.includes("force");
 
 if (!routeName) {
     console.error("🔴 Please provide a route name: ts-node generate-api.ts <routeName>");
@@ -36,12 +35,7 @@ Object.values(dirs).forEach((dir) => {
 });
 
 // Types
-const typesTemplate = `export interface I${pascalCase} {
-  _id: string;
-  name: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+const typesTemplate = `import { I${pascalCase} } from "../models";
 
 export interface Create${pascalCase}Dto {
   name: string;
@@ -55,7 +49,7 @@ export interface ${pascalCase}QueryOptions {
   limit?: number;
   offset?: number;
   sortBy?: keyof I${pascalCase};
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: 'asc' | '';
 }
 
 export interface ApiResponse<T> {
@@ -68,8 +62,13 @@ export interface ApiResponse<T> {
 
 // MongoDB model
 const modelTemplate = `import mongoose, { Schema, Document } from 'mongoose';
-import { I${pascalCase} } from '../types/${kebabCase}.types';
 
+export interface I${pascalCase} {
+  _id: string;
+  name: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 const ${camelCase}Schema = new Schema<I${pascalCase}>(
   {
@@ -78,13 +77,13 @@ const ${camelCase}Schema = new Schema<I${pascalCase}>(
   { timestamps: true }
 );
 
-export const ${pascalCase}Model = mongoose.model<I${pascalCase}>('${pascalCase}', ${camelCase}Schema);
+export const ${pascalCase} = mongoose.model<I${pascalCase}>('${pascalCase}', ${camelCase}Schema);
 `;
 
 // Controller with static methods
 const controllerTemplate = `import { Request, Response } from 'express';
-import { ${pascalCase}Service } from '../services/${kebabCase}.service';
-import { Create${pascalCase}Dto, Update${pascalCase}Dto, I${pascalCase} } from '../types/${kebabCase}.types';
+import { ${pascalCase}Service } from '../services';
+import { Create${pascalCase}Dto, Update${pascalCase}Dto } from '../types/${kebabCase}.types';
 import { asyncHandler, ApiResponse, ApiError } from '../utils';
 
 export class ${pascalCase}Controller {
@@ -124,8 +123,9 @@ export class ${pascalCase}Controller {
 `;
 
 // Service with static methods
-const serviceTemplate = `import { ${pascalCase}Repository } from '../repositories/${kebabCase}.repository';
-import { I${pascalCase}, Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
+const serviceTemplate = `import { ${pascalCase}Repository } from '../repositories';
+import { Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
+import { I${pascalCase} } from "../models"
 
 export class ${pascalCase}Service {
   static async getAll(options?: ${pascalCase}QueryOptions): Promise<I${pascalCase}[]> {
@@ -151,12 +151,12 @@ export class ${pascalCase}Service {
 `;
 
 // Repository with real MongoDB ops
-const repositoryTemplate = `import { ${pascalCase}Model } from '../models/${kebabCase}.model';
-import { I${pascalCase}, Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
+const repositoryTemplate = `import { ${pascalCase}, I${pascalCase} } from '../models';
+import { Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
 
 export class ${pascalCase}Repository {
   static async findAll(options?: ${pascalCase}QueryOptions): Promise<I${pascalCase}[]> {
-    const query = ${pascalCase}Model.find();
+    const query = ${pascalCase}.find();
     if (options?.limit) query.limit(options.limit);
     if (options?.offset) query.skip(options.offset);
     if (options?.sortBy && options?.sortOrder) query.sort({ [options.sortBy]: options.sortOrder });
@@ -164,20 +164,20 @@ export class ${pascalCase}Repository {
   }
 
   static async findById(id: string): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}Model.findById(id).exec();
+    return await ${pascalCase}.findById(id).exec();
   }
 
   static async create(data: Create${pascalCase}Dto): Promise<I${pascalCase}> {
-    const newDoc = new ${pascalCase}Model(data);
+    const newDoc = new ${pascalCase}(data);
     return await newDoc.save();
   }
 
   static async update(id: string, data: Update${pascalCase}Dto): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}Model.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true }).exec();
+    return await ${pascalCase}.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true }).exec();
   }
 
   static async delete(id: string): Promise<boolean> {
-    const result = await ${pascalCase}Model.findByIdAndDelete(id).exec();
+    const result = await ${pascalCase}.findByIdAndDelete(id).exec();
     return result !== null;
   }
 }
@@ -185,17 +185,17 @@ export class ${pascalCase}Repository {
 
 // Routes
 const routeTemplate = `import { Router } from 'express';
-import { ${pascalCase}Controller } from '../controllers/${kebabCase}.controller';
-import { validate } from "../middlewares";
-import { ${pascalCase}Schema } from "../validators/${kebabCase}.validator";
+import { ${pascalCase}Controller } from '../controllers';
+import { validate, firebaseAuth } from "../middlewares";
+import { ${pascalCase}Schema } from "../validators";
 
 const router = Router();
 
-router.get('/', validate(${pascalCase}Schema.getAll), ${pascalCase}Controller.getAll);
-router.get('/:id', validate(${pascalCase}Schema.getOne), ${pascalCase}Controller.getById);
-router.post('/', validate(${pascalCase}Schema.create), ${pascalCase}Controller.create);
-router.put('/:id', validate(${pascalCase}Schema.update), ${pascalCase}Controller.update);
-router.delete('/:id', validate(${pascalCase}Schema.deleteOne), ${pascalCase}Controller.delete);
+router.get('/', firebaseAuth(), validate(${pascalCase}Schema.getAll), ${pascalCase}Controller.getAll);
+router.get('/:id', firebaseAuth(), validate(${pascalCase}Schema.getOne), ${pascalCase}Controller.getById);
+router.post('/', firebaseAuth(), validate(${pascalCase}Schema.create), ${pascalCase}Controller.create);
+router.put('/:id', firebaseAuth(), validate(${pascalCase}Schema.update), ${pascalCase}Controller.update);
+router.delete('/:id', firebaseAuth(), validate(${pascalCase}Schema.deleteOne), ${pascalCase}Controller.delete);
 
 export default router;
 `;
@@ -233,6 +233,76 @@ export const ${pascalCase}Schema = {
 };
 `;
 
+function updateIndexFile(indexFilePath: string, className: string, fileName: string) {
+    // Read existing index.ts
+    let content = "";
+    if (fs.existsSync(indexFilePath)) {
+        content = fs.readFileSync(indexFilePath, "utf8");
+    }
+
+    // Create import line
+    const importLine = `import { ${className} } from "./${fileName}";`;
+
+    // If not already imported, add it
+    if (!content.includes(importLine)) {
+        content = importLine + "\n" + content;
+    }
+
+    // Ensure it's in the export block
+    const exportRegex = /export\s*{\s*([^}]*)}/s;
+    if (exportRegex.test(content)) {
+        // Already has an export block → inject
+        content = content.replace(exportRegex, (match, exports) => {
+            if (!exports.includes(className)) {
+                return `export { ${exports.trim()}, ${className} }`;
+            }
+            return match;
+        });
+    } else {
+        // No export block yet → add one
+        content += `\nexport { ${className} };`;
+    }
+
+    // Write back to file
+    fs.writeFileSync(indexFilePath, content, "utf8");
+    console.log(`✅ Updated ${indexFilePath} with ${className}`);
+}
+
+function updateModelIndexFile(indexFilePath: string, className: string, fileName: string) {
+    // Read existing index.ts
+    let content = "";
+    if (fs.existsSync(indexFilePath)) {
+        content = fs.readFileSync(indexFilePath, "utf8");
+    }
+
+    // Create import line
+    const importLine = `import { ${className}, I${className} } from "./${fileName}";`;
+
+    // If not already imported, add it
+    if (!content.includes(importLine)) {
+        content = importLine + "\n" + content;
+    }
+
+    // Ensure it's in the export block
+    const exportRegex = /export\s*{\s*([^}]*)}/s;
+    if (exportRegex.test(content)) {
+        // Already has an export block → inject
+        content = content.replace(exportRegex, (match, exports) => {
+            if (!exports.includes(className)) {
+                return `export { ${exports.trim()}, ${className}, I${className} }`;
+            }
+            return match;
+        });
+    } else {
+        // No export block yet → add one
+        content += `\nexport { ${className}, I${className} };`;
+    }
+
+    // Write back to file
+    fs.writeFileSync(indexFilePath, content, "utf8");
+    console.log(`✅ Updated ${indexFilePath} with ${className}`);
+}
+
 // File paths
 const files = {
     types: path.join(dirs.types, `${kebabCase}.types.ts`),
@@ -252,17 +322,45 @@ if (existingFiles.length > 0) {
     existingFiles.forEach(([type, filePath]) =>
         console.log(`   - ${path.relative(process.cwd(), filePath)}`)
     );
+    process.exit(1);
 }
 
 // Create files
 try {
     fs.writeFileSync(files.types, typesTemplate);
+
     fs.writeFileSync(files.model, modelTemplate);
+    updateModelIndexFile(path.join(dirs.models, "index.ts"), `${pascalCase}`, `${kebabCase}.model`);
+
     fs.writeFileSync(files.controller, controllerTemplate);
+    updateIndexFile(
+        path.join(dirs.controllers, "index.ts"),
+        `${pascalCase}Controller`,
+        `${kebabCase}.controller`
+    );
+
     fs.writeFileSync(files.service, serviceTemplate);
+    updateIndexFile(
+        path.join(dirs.services, "index.ts"),
+        `${pascalCase}Service`,
+        `${kebabCase}.service`
+    );
+
     fs.writeFileSync(files.repository, repositoryTemplate);
+    updateIndexFile(
+        path.join(dirs.repositories, "index.ts"),
+        `${pascalCase}Repository`,
+        `${kebabCase}.repository`
+    );
+
     fs.writeFileSync(files.route, routeTemplate);
+
     fs.writeFileSync(files.validator, validatorTemplate);
+    updateIndexFile(
+        path.join(dirs.validators, "index.ts"),
+        `${pascalCase}Schema`,
+        `${kebabCase}.validator`
+    );
 
     console.log(`🔵 Successfully generated TypeScript API files for '${routeName}':\n`);
     Object.values(files).forEach((file) => console.log(`📁 ${path.relative(process.cwd(), file)}`));
