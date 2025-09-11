@@ -1,10 +1,10 @@
+import { admin } from "#config";
+import { IUser, IClient, IAdmin } from "#models";
+import { AuthService } from "#services";
+import { ApiError } from "#utils";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
-import { admin } from "../config";
-import { ApiError } from "../utils";
-import { AuthService } from "../services";
 import { ParsedQs } from "qs";
-import { IUser, IClient, IAdmin } from "../models";
 
 declare module "express-serve-static-core" {
     interface Request {

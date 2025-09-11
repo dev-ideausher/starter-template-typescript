@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { config } from "../config";
-import { ApiError } from "../utils";
+import { ApiError } from "#utils";
+import { config } from "#config";
 
 interface S3Response {
     url: string;

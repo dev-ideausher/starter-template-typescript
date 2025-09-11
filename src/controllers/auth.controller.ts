@@ -1,12 +1,12 @@
 import { Response } from "express";
-import { AuthService } from "../services";
-import { ApiError, ApiResponse, asyncHandler } from "../utils";
-import { CustomRequest } from "../middlewares";
-import { RegisterRequest } from "../types";
 import httpStatus from "http-status";
+import { AuthRequest } from "#middlewares";
+import { AuthService } from "#services";
+import { RegisterRequest } from "#types";
+import { asyncHandler, ApiError, ApiResponse } from "#utils";
 
 export class AuthController {
-    static register = asyncHandler(async (req: CustomRequest<RegisterRequest>, res: Response) => {
+    static register = asyncHandler(async (req: AuthRequest<RegisterRequest>, res: Response) => {
         if (req.user) {
             throw new ApiError(409, "User already registered");
         }
@@ -21,7 +21,7 @@ export class AuthController {
             .json(new ApiResponse(httpStatus.CREATED, user, "User registered successfull y"));
     });
 
-    static login = asyncHandler(async (req: CustomRequest, res: Response) => {
+    static login = asyncHandler(async (req: AuthRequest, res: Response) => {
         return res
             .status(httpStatus.OK)
             .json(new ApiResponse(httpStatus.OK, req.user, "User logged in successfully"));

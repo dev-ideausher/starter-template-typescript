@@ -1,7 +1,7 @@
+import { AuthRequest } from "#middlewares";
+import { UserService } from "#services";
+import { asyncHandler, ApiResponse } from "#utils";
 import { Response, Request } from "express";
-import { UserService } from "../services";
-import { ApiResponse, asyncHandler } from "../utils";
-import { AuthRequest, CustomRequest } from "../middlewares";
 import httpStatus from "http-status";
 
 export class UserController {

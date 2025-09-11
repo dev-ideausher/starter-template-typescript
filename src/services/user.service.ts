@@ -1,9 +1,9 @@
-import { S3Folders } from "../config";
-import { S3Service } from "../microservices";
-import { IUser } from "../models";
-import { UserRepository } from "../repositories";
-import { UpdateUserRequest } from "../types/user.types";
-import { ApiError } from "../utils";
+import { S3Folders } from "#config";
+import { S3Service } from "#microservices";
+import { IUser } from "#models";
+import { UserRepository } from "#repositories";
+import { UpdateUserRequest } from "#types";
+import { ApiError } from "#utils";
 import httpStatus from "http-status";
 
 export class UserService {

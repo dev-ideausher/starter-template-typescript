@@ -3,13 +3,30 @@
     "version": "1.0.0",
     "description": "This is a TypeScript starter template for building backend applications with Express.",
     "main": "dist/server.js",
+    "type": "module",
+    "imports": {
+        "#config": "./dist/config/index.js",
+        "#utils": "./dist/utils/index.js",
+        "#controllers": "./dist/controllers/index.js",
+        "#middlewares": "./dist/middlewares/index.js",
+        "#validators": "./dist/validators/index.js",
+        "#routes": "./dist/routes/index.js",
+        "#models": "./dist/models/index.js",
+        "#services": "./dist/services/index.js",
+        "#repositories": "./dist/repositories/index.js",
+        "#microservices": "./dist/microservices/index.js",
+        "#types": "./dist/types/index.js"
+    },
     "scripts": {
+        "clean": "rimraf dist",
         "build": "tsc",
-        "start": "node dist/server.js",
-        "dev": "nodemon --ext ts --exec ts-node src/server.ts",
         "watch": "tsc -w",
-        "generate": "ts-node src/scripts/generate-api.ts",
-        "remove": "ts-node src/scripts/remove-api.ts"
+        "dev": "concurrently \"npm:watch\" \"npm:dev:run\"",
+        "watch:": "echo 'do not call directly'",
+        "dev:run": "nodemon --config nodemon.dist.json",
+        "start": "node dist/server.js",
+        "generate": "ts-node --esm -r tsconfig-paths/register src/scripts/generate-api.ts",
+        "remove": "ts-node --esm -r tsconfig-paths/register src/scripts/remove-api.ts"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.879.0",
@@ -48,8 +65,11 @@
         "@types/nodemailer": "^6.4.9",
         "@typescript-eslint/eslint-plugin": "^6.4.0",
         "@typescript-eslint/parser": "^6.4.0",
+        "concurrently": "^9.2.1",
         "nodemon": "^3.1.10",
+        "rimraf": "^6.0.1",
         "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.2.0",
         "typescript": "^5.1.6"
     },
     "keywords": [
@@ -60,3 +80,4 @@
     "author": "Abhay Pratap Yadav",
     "license": "MIT"
 }
+

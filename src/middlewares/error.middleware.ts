@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
-import { ApiError, removedUnusedMulterImageFilesOnError } from "../utils";
+import { ApiError, removedUnusedMulterImageFilesOnError } from "#utils";
 
 // Make it generic over any Request type
 const errorHandler: ErrorRequestHandler = (

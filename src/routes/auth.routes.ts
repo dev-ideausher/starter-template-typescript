@@ -1,9 +1,8 @@
+import { userTypes } from "#config";
+import { AuthController } from "#controllers";
+import { firebaseAuth, upload, validate } from "#middlewares";
+import { AuthSchema } from "#validators";
 import { Router } from "express";
-import { AuthController } from "../controllers";
-import { upload, validate } from "../middlewares";
-import { AuthSchema } from "../validators";
-import { firebaseAuth } from "../middlewares/firebase.middleware";
-import { userTypes } from "../config";
 
 const router = Router();
 

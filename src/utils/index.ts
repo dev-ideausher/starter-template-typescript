@@ -1,8 +1,8 @@
-import { ApiError } from "./ApiError";
-import { ApiResponse } from "./ApiResponse";
-import { asyncHandler } from "./asyncHandler";
-import { removeLocalFile, removedUnusedMulterImageFilesOnError } from "./filehandler";
-import { pick } from "./pick";
+import { ApiError } from "./ApiError.js";
+import { ApiResponse } from "./ApiResponse.js";
+import { asyncHandler } from "./asyncHandler.js";
+import { removeLocalFile, removedUnusedMulterImageFilesOnError } from "./filehandler.js";
+import { pick } from "./pick.js";
 
 export {
     ApiError,
