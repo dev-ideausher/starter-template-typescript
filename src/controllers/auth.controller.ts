@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import { AuthRequest } from "#middlewares";
 import { AuthService } from "#services";
 import { RegisterRequest } from "#types";
-import { asyncHandler, ApiError, ApiResponse } from "#utils";
+import { asyncHandler, ApiError, sendResponse } from "#utils";
 
 export class AuthController {
     static register = asyncHandler(async (req: AuthRequest<RegisterRequest>, res: Response) => {
@@ -16,14 +16,10 @@ export class AuthController {
             req.routeType!,
             req.file?.path
         );
-        return res
-            .status(httpStatus.CREATED)
-            .json(new ApiResponse(httpStatus.CREATED, user, "User registered successfull y"));
+        return sendResponse(res, httpStatus.OK, user, "User registered successfully");
     });
 
     static login = asyncHandler(async (req: AuthRequest, res: Response) => {
-        return res
-            .status(httpStatus.OK)
-            .json(new ApiResponse(httpStatus.OK, req.user, "User logged in successfully"));
+        return sendResponse(res, httpStatus.OK, req.user, "User registered successfully");
     });
 }

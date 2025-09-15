@@ -1,3 +1,5 @@
+import { Response } from "express";
+
 class ApiResponse<T> {
     public statusCode: number;
     public data: T;
@@ -12,4 +14,8 @@ class ApiResponse<T> {
     }
 }
 
-export { ApiResponse };
+function sendResponse<T>(res: Response, statusCode: number, data: T, message = "Success") {
+    return res.status(statusCode).json(new ApiResponse<T>(statusCode, data, message));
+}
+
+export { ApiResponse, sendResponse };
