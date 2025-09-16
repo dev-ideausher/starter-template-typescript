@@ -4,29 +4,10 @@
     "description": "This is a TypeScript starter template for building backend applications with Express.",
     "main": "dist/server.js",
     "type": "module",
-    "imports": {
-        "#config": "./dist/config/index.js",
-        "#utils": "./dist/utils/index.js",
-        "#controllers": "./dist/controllers/index.js",
-        "#middlewares": "./dist/middlewares/index.js",
-        "#validators": "./dist/validators/index.js",
-        "#routes": "./dist/routes/index.js",
-        "#models": "./dist/models/index.js",
-        "#services": "./dist/services/index.js",
-        "#repositories": "./dist/repositories/index.js",
-        "#microservices": "./dist/microservices/index.js",
-        "#types": "./dist/types/index.js"
-    },
     "scripts": {
-        "clean": "rimraf dist",
-        "build": "tsc",
-        "watch": "tsc -w",
-        "dev": "concurrently \"npm:watch\" \"npm:dev:run\"",
-        "watch:": "echo 'do not call directly'",
-        "dev:run": "nodemon --config nodemon.dist.json",
-        "start": "node dist/server.js",
-        "generate": "ts-node --esm -r tsconfig-paths/register src/scripts/generate-api.ts",
-        "remove": "ts-node --esm -r tsconfig-paths/register src/scripts/remove-api.ts"
+        "dev": "concurrently -k -n TSC,ALIAS,NODE -c yellow,cyan,green \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/server.js\"",
+        "build": "tsc && tsc-alias",
+        "start": "node dist/server.js"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.879.0",
@@ -47,6 +28,7 @@
         "http-status": "^2.1.0",
         "joi": "^17.9.2",
         "jsonwebtoken": "^9.0.2",
+        "module-alias": "^2.2.3",
         "mongoose": "^7.5.0",
         "morgan": "^1.10.1",
         "multer": "^2.0.2",
@@ -69,8 +51,12 @@
         "nodemon": "^3.1.10",
         "rimraf": "^6.0.1",
         "ts-node": "^10.9.1",
+        "tsc-alias": "^1.8.16",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.1.6"
+    },
+    "_moduleAliases": {
+        "@": "dist"
     },
     "keywords": [
         "express",

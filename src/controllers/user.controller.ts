@@ -1,6 +1,6 @@
-import { AuthRequest } from "#middlewares";
-import { UserService } from "#services";
-import { asyncHandler, sendResponse } from "#utils";
+import { AuthRequest } from "@middlewares";
+import { UserService } from "@services";
+import { asyncHandler, sendResponse } from "@utils";
 import { Response, Request } from "express";
 import httpStatus from "http-status";
 
@@ -14,7 +14,7 @@ export class UserController {
             res,
             httpStatus.OK,
             { available: !userExits },
-            "Username checked successfully"
+            "Username checked successfully!"
         );
     });
 

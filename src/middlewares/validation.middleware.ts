@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Joi, { ObjectSchema } from "joi";
 import httpStatus from "http-status";
-import { pick, ApiError } from "#utils";
+import { pick, ApiError } from "@utils";
 
 type ValidationSchema = Partial<{
     params: ObjectSchema;

@@ -1,7 +1,7 @@
-import { admin } from "#config";
-import { IUser, IClient, IAdmin } from "#models";
-import { AuthService } from "#services";
-import { ApiError } from "#utils";
+import { admin } from "@config";
+import { IUser, IClient, IAdmin } from "@models";
+import { AuthService } from "@services";
+import { ApiError } from "@utils";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import { ParsedQs } from "qs";

@@ -1,4 +1,4 @@
-import { Admin, Client, IAdmin, IClient, IUser, User } from "#models";
+import { Admin, Client, IAdmin, IClient, IUser, User } from "@models";
 import { FilterQuery, UpdateQuery } from "mongoose";
 
 export class UserRepository {

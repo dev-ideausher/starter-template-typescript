@@ -1,6 +1,6 @@
 import morgan, { StreamOptions } from "morgan";
 import { Request, Response } from "express";
-import { config, logger } from "#config";
+import { config, logger } from "@config";
 
 // Custom token for error message
 morgan.token("message", (_req: Request, res: Response) => res.locals.errorMessage || "");

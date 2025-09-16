@@ -11,21 +11,41 @@
         "rootDir": "./src",
         "baseUrl": "./src",
         "paths": {
-            "#controllers": ["controllers/index.ts"],
-            "#middlewares": ["middlewares/index.ts"],
-            "#validators": ["validators/index.ts"],
-            "#config": ["config/index.ts"],
-            "#utils": ["utils/index.ts"],
-            "#models": ["models/index.ts"],
-            "#services": ["services/index.ts"],
-            "#repositories": ["repositories/index.ts"],
-            "#microservices": ["microservices/index.ts"],
-            "#types/*": ["types/*"],
-            "#types": ["types/index.ts"],
-            "#routes": ["routes/index.ts"]
+            "@controllers": ["controllers/index.ts"],
+            "@controllers/*": ["controllers/*"],
+
+            "@middlewares": ["middlewares/index.ts"],
+            "@middlewares/*": ["middlewares/*"],
+
+            "@validators": ["validators/index.ts"],
+            "@validators/*": ["validators/*"],
+
+            "@config": ["config/index.ts"],
+            "@config/*": ["config/*"],
+
+            "@utils": ["utils/index.ts"],
+            "@utils/*": ["utils/*"],
+
+            "@models": ["models/index.ts"],
+            "@models/*": ["models/*"],
+
+            "@services": ["services/index.ts"],
+            "@services/*": ["services/*"],
+
+            "@repositories": ["repositories/index.ts"],
+            "@repositories/*": ["repositories/*"],
+
+            "@microservices": ["microservices/index.ts"],
+            "@microservices/*": ["microservices/*"],
+
+            "@types": ["types/index.ts"],
+            "@types/*": ["types/*"],
+
+            "@routes": ["routes/index.ts"],
+            "@routes/*": ["routes/*"]
         }
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "register-paths.js"],
     "exclude": ["node_modules", "**/*.spec.ts"]
 }
 

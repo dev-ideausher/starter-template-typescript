@@ -1,9 +1,9 @@
 import { Response } from "express";
 import httpStatus from "http-status";
-import { AuthRequest } from "#middlewares";
-import { AuthService } from "#services";
-import { RegisterRequest } from "#types";
-import { asyncHandler, ApiError, sendResponse } from "#utils";
+import { AuthRequest } from "@middlewares";
+import { AuthService } from "@services";
+import { RegisterRequest } from "@types";
+import { asyncHandler, ApiError, sendResponse } from "@utils";
 
 export class AuthController {
     static register = asyncHandler(async (req: AuthRequest<RegisterRequest>, res: Response) => {
