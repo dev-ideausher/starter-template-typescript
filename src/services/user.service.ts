@@ -35,7 +35,7 @@ export class UserService {
             }
         }
 
-        const updatedUser = await UserRepository.findByIdAndUpdate(user._id, updates);
+        const updatedUser = await UserRepository.findByIdAndUpdate(user!._id, updates);
         if (!updatedUser) {
             throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
         }

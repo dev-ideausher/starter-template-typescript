@@ -10,8 +10,8 @@ dotenv.config();
 
 const PORT: number = parseInt(process.env.PORT || "8000", 10);
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const initializeServer = async (): Promise<void> => {
     try {
