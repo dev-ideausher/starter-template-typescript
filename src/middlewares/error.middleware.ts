@@ -30,7 +30,7 @@ const errorHandler: ErrorRequestHandler = (
         ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}),
     };
 
-    console.error(`${error.message}`);
+    res.locals.errorMessage = error.message;
 
     if (req.file || req.files) {
         removedUnusedMulterImageFilesOnError(req as any);

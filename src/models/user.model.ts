@@ -1,6 +1,7 @@
 import { Schema, model, Document } from "mongoose";
 
 export interface IUser extends Document {
+    _id: string;
     email: string;
     name?: string;
     username?: string;
@@ -123,9 +124,6 @@ const adminSchema = new Schema<IAdmin>(
     },
     { timestamps: true }
 );
-
-// Index for username uniqueness
-userSchema.index({ username: 1 }, { unique: true, sparse: true });
 
 export const User = model<IUser>("User", userSchema);
 export const Client = User.discriminator<IClient>("Client", clientSchema);
