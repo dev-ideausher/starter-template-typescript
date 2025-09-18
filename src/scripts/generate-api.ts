@@ -34,34 +34,8 @@ Object.values(dirs).forEach((dir) => {
     }
 });
 
-// Types
-const typesTemplate = `import { I${pascalCase} } from "../models";
-
-export interface Create${pascalCase}Dto {
-  name: string;
-}
-
-export interface Update${pascalCase}Dto {
-  name?: string;
-}
-
-export interface ${pascalCase}QueryOptions {
-  limit?: number;
-  offset?: number;
-  sortBy?: keyof I${pascalCase};
-  sortOrder?: 'asc' | '';
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-}
-`;
-
 // MongoDB model
-const modelTemplate = `import mongoose, { Schema, Document } from 'mongoose';
+const modelTemplate = `import mongoose, { Schema } from 'mongoose';
 
 export interface I${pascalCase} {
   _id: string;
@@ -81,103 +55,111 @@ export const ${pascalCase} = mongoose.model<I${pascalCase}>('${pascalCase}', ${c
 `;
 
 // Controller with static methods
-const controllerTemplate = `import { Request, Response } from 'express';
+const controllerTemplate = `import { Response } from 'express';
 import { ${pascalCase}Service } from '../services';
-import { Create${pascalCase}Dto, Update${pascalCase}Dto } from '../types/${kebabCase}.types';
-import { asyncHandler, ApiResponse, ApiError } from '../utils';
+import { I${pascalCase} } from '../models';
+import { AuthRequest } from "../middlewares";
+import { asyncHandler, sendResponse, ApiError } from '../utils';
+import httpStatus from "http-status";
 
 export class ${pascalCase}Controller {
-  static getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const items = await ${pascalCase}Service.getAll();    
-    res.status(200).json(new ApiResponse(200, items, 'All ${pascalCase} documents fetched successfully'));
+  static getAll = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+    const ${camelCase}s = await ${pascalCase}Service.getAll(req.query);    
+    sendResponse(res, httpStatus.OK, ${camelCase}s, 'All ${pascalCase} documents fetched successfully');
   });
 
-  static getById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  static getById = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const { id } = req.params;
-    const item = await ${pascalCase}Service.getById(id);
-    if (!item) throw new ApiError(404, '${pascalCase} not found');
-    res.status(200).json(new ApiResponse(200, item, '${pascalCase} fetched successfully'));
+    const ${camelCase} = await ${pascalCase}Service.getById(id);    
+    sendResponse(res, httpStatus.OK, ${camelCase}, '${pascalCase} fetched successfully');
   });
 
-  static create = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const createDto: Create${pascalCase}Dto = req.body;
-    const item = await ${pascalCase}Service.create(createDto);
-    res.status(201).json(new ApiResponse(201, item, '${pascalCase} created successfully'));
+  static create = asyncHandler(async (req: AuthRequest<Partial<I${pascalCase}>>, res: Response): Promise<void> => {
+    const createDto: Partial<I${pascalCase}> = req.body;
+    const ${camelCase} = await ${pascalCase}Service.create(createDto);
+    sendResponse(res, httpStatus.CREATED, ${camelCase}, '${pascalCase} created successfully');
   });
 
-  static update = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  static update = asyncHandler(async (req: AuthRequest<Partial<I${pascalCase}>>, res: Response): Promise<void> => {
     const { id } = req.params;
-    const updateDto: Update${pascalCase}Dto = req.body;
-    const item = await ${pascalCase}Service.update(id, updateDto);
-    if (!item) throw new ApiError(404, '${pascalCase} not found');
-    res.status(200).json(new ApiResponse(200, item, '${pascalCase} updated successfully'));
+    const updateDto: Partial<I${pascalCase}> = req.body;
+    const ${camelCase} = await ${pascalCase}Service.update(id, updateDto);    
+    sendResponse(res, httpStatus.OK, ${camelCase}, '${pascalCase} updated successfully');
   });
 
-  static delete = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  static delete = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const { id } = req.params;
-    const deleted = await ${pascalCase}Service.delete(id);
-    if (!deleted) throw new ApiError(404, '${pascalCase} not found');
-    res.status(200).json(new ApiResponse(200, {}, '${pascalCase} deleted successfully'));
+    const deleted = await ${pascalCase}Service.delete(id);    
+    sendResponse(res, httpStatus.OK, deleted, '${pascalCase} deleted successfully');
   });
 }
 `;
 
 // Service with static methods
 const serviceTemplate = `import { ${pascalCase}Repository } from '../repositories';
-import { Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
-import { I${pascalCase} } from "../models"
+import { ${pascalCase}, I${pascalCase} } from "../models"
+import { PipelineStage } from "mongoose";
+import { PaginationQuery, ApiError } from "../utils";
+import httpStatus from "http-status";
 
 export class ${pascalCase}Service {
-  static async getAll(options?: ${pascalCase}QueryOptions): Promise<I${pascalCase}[]> {
-    return await ${pascalCase}Repository.findAll(options);
+  static async getAll(options: PaginationQuery): Promise<I${pascalCase}[]> {
+    const filters: PipelineStage[] = [];
+    return await ${pascalCase}Repository.findAll(filters, options);
   }
 
-  static async getById(id: string): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}Repository.findById(id);
+  static async getById(id: string): Promise<I${pascalCase}> {
+    const ${camelCase} = await ${pascalCase}Repository.findById(id);
+    if(!${camelCase}){
+      throw new ApiError(httpStatus.NOT_FOUND, "${pascalCase} not found")
+    }
+    return ${camelCase};
   }
 
-  static async create(data: Create${pascalCase}Dto): Promise<I${pascalCase}> {
-    return await ${pascalCase}Repository.create(data);
+  static async create(data: Partial<I${pascalCase}>): Promise<I${pascalCase}> {
+    return ${pascalCase}Repository.create(data);
   }
 
-  static async update(id: string, data: Update${pascalCase}Dto): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}Repository.update(id, data);
+  static async update(id: string, data: Partial<I${pascalCase}>): Promise<I${pascalCase} | null> {
+    const ${camelCase} = await ${pascalCase}Repository.update(id, data);
+    if(!${camelCase}){
+      throw new ApiError(httpStatus.NOT_FOUND, "${pascalCase} not found")
+    }
+    return ${camelCase};
   }
 
   static async delete(id: string): Promise<boolean> {
-    return await ${pascalCase}Repository.delete(id);
+    return ${pascalCase}Repository.delete(id);
   }
 }
 `;
 
 // Repository with real MongoDB ops
-const repositoryTemplate = `import { ${pascalCase}, I${pascalCase} } from '../models';
-import { Create${pascalCase}Dto, Update${pascalCase}Dto, ${pascalCase}QueryOptions } from '../types/${kebabCase}.types';
+const repositoryTemplate = `import { PipelineStage } from "mongoose";
+import {${pascalCase}, I${pascalCase}} from "../models";
+import { pagination, PaginationQuery } from "../utils";
 
 export class ${pascalCase}Repository {
-  static async findAll(options?: ${pascalCase}QueryOptions): Promise<I${pascalCase}[]> {
-    const query = ${pascalCase}.find();
-    if (options?.limit) query.limit(options.limit);
-    if (options?.offset) query.skip(options.offset);
-    if (options?.sortBy && options?.sortOrder) query.sort({ [options.sortBy]: options.sortOrder });
-    return await query.exec();
+  static async findAll(filters: PipelineStage[], options: PaginationQuery): Promise<I${pascalCase}[]> {
+    const pipeline: PipelineStage[] = [...filters, ...pagination(options)];
+    return ${pascalCase}.aggregate(pipeline);
   }
 
   static async findById(id: string): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}.findById(id).exec();
+    return ${pascalCase}.findById(id);
   }
 
-  static async create(data: Create${pascalCase}Dto): Promise<I${pascalCase}> {
+  static async create(data: Partial<I${pascalCase}>): Promise<I${pascalCase}> {
     const newDoc = new ${pascalCase}(data);
-    return await newDoc.save();
+    return newDoc.save();
   }
 
-  static async update(id: string, data: Update${pascalCase}Dto): Promise<I${pascalCase} | null> {
-    return await ${pascalCase}.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true }).exec();
+  static async update(id: string, data: Partial<I${pascalCase}>): Promise<I${pascalCase} | null> {
+    return ${pascalCase}.findByIdAndUpdate(id, data, { new: true });
   }
 
   static async delete(id: string): Promise<boolean> {
-    const result = await ${pascalCase}.findByIdAndDelete(id).exec();
+    const result = await ${pascalCase}.findByIdAndDelete(id);
     return result !== null;
   }
 }
@@ -289,7 +271,7 @@ function updateModelIndexFile(indexFilePath: string, className: string, fileName
         // Already has an export block → inject
         content = content.replace(exportRegex, (match, exports) => {
             if (!exports.includes(className)) {
-                return `export { ${exports.trim()}, ${className}, I${className} }`;
+                return `export { ${exports.trim()} ${className}, I${className} }`;
             }
             return match;
         });
@@ -327,8 +309,6 @@ if (existingFiles.length > 0) {
 
 // Create files
 try {
-    fs.writeFileSync(files.types, typesTemplate);
-
     fs.writeFileSync(files.model, modelTemplate);
     updateModelIndexFile(path.join(dirs.models, "index.ts"), `${pascalCase}`, `${kebabCase}.model`);
 
