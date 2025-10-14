@@ -1,4 +1,4 @@
-import express, { Response } from "express";
+import express, { Request, Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
@@ -7,6 +7,7 @@ import hpp from "hpp";
 import routes from "@routes";
 import { errorHandler, errorLogger, successLogger } from "@middlewares";
 import { config } from "@config";
+import { performHealthCheck } from "@utils";
 
 const app = express();
 
@@ -41,16 +42,24 @@ if (config.nodeEnv !== "development") {
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
-// Healthcheck
-app.get("/", (_req, res: Response) => {
-    res.status(200).send({ status: "OK", statusCode: 200 });
-});
-
-app.get("/health", (_req, res: Response) => {
-    res.status(200).send({ status: "OK", statusCode: 200 });
-});
 
 app.use("/v1", routes);
+
+app.get("/health", async (req: Request, res: Response) => {
+    try {
+        const detailed = req.query.detailed === 'true';
+        const { data, statusCode } = await performHealthCheck(detailed);
+        res.status(statusCode).json(data);
+    } catch (error: any) {
+        res.status(500).json({
+            status: 'unhealthy',
+            message: 'Health check failed',
+            timestamp: new Date().toISOString(),
+            error: error.message,
+            environment: config.nodeEnv,
+        });
+    }
+});
 
 app.use(errorHandler);
 

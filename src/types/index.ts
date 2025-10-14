@@ -1,9 +1,7 @@
 import { GoogleTokenPayload, AppleTokenPayload, RegisterRequest } from "./auth.types.js";
 import { UpdateUserRequest } from "./user.types.js";
+import { HealthCheckResponse, DatabaseHealth } from "./systemCheck.type.js";
 
-interface JWTPayload {
-    id: string;
-    email: string;
-}
 
-export { UpdateUserRequest, JWTPayload, GoogleTokenPayload, AppleTokenPayload, RegisterRequest };
+
+export { UpdateUserRequest, GoogleTokenPayload, AppleTokenPayload, RegisterRequest, HealthCheckResponse, DatabaseHealth };
