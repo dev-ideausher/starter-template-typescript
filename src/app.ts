@@ -43,10 +43,14 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 // Healthcheck
 app.get("/", (_req, res: Response) => {
-    res.status(200).send({ status: "OK" });
+    res.status(200).send({ status: "OK", statusCode: 200 });
 });
 
-app.use("/api/v1", routes);
+app.get("/health", (_req, res: Response) => {
+    res.status(200).send({ status: "OK", statusCode: 200 });
+});
+
+app.use("/v1", routes);
 
 app.use(errorHandler);
 

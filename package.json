@@ -2,12 +2,12 @@
     "name": "starter-template-typescript",
     "version": "1.0.0",
     "description": "This is a TypeScript starter template for building backend applications with Express.",
-    "main": "dist/server.js",
+    "main": "dist/index.js",
     "type": "module",
     "scripts": {
-        "dev": "concurrently -k -n TSC,ALIAS,NODE -c yellow,cyan,green \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/server.js\"",
+        "dev": "concurrently -k -n TSC,ALIAS,NODE -c yellow,cyan,green \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/index.js\"",
         "build": "tsc && tsc-alias",
-        "start": "node dist/server.js"
+        "start": "node dist/index.js"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.890.0",
