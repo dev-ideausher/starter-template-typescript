@@ -1,26 +1,23 @@
 import { Request, Response, NextFunction } from "express";
-import Joi, { ObjectSchema } from "joi";
+import { z, ZodError, ZodObject } from "zod";
 import httpStatus from "http-status";
-import { pick, ApiError } from "@utils";
+import { ApiError, pick } from "@utils";
 
 type ValidationSchema = Partial<{
-    params: ObjectSchema;
-    query: ObjectSchema;
-    body: ObjectSchema;
-    files: ObjectSchema;
-    file: ObjectSchema;
+    params: ZodObject<any>;
+    query: ZodObject<any>;
+    body: ZodObject<any>;
+    files: ZodObject<any>;
+    file: ZodObject<any>;
 }>;
 
 export const validate =
     (schema: ValidationSchema) =>
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        // Check if request content type is JSON
         const isJsonContentType = req.is("application/json");
-
-        // Check if request content type is form-data
         const isFormDataContentType = req.is("multipart/form-data");
 
-        // Reject requests with unsupported content types
+        // Reject unsupported content types
         if (
             Object.keys(req.body || {}).length !== 0 &&
             !isJsonContentType &&
@@ -34,43 +31,46 @@ export const validate =
             );
         }
 
-        // cherry-pick fields from the input schema ["params", "query", "body", "files", "file"]
+        // Pick only defined schema parts
         const validSchema = pick(schema, ["params", "query", "files", "file", "body"] as const);
-
         const object = pick(req, Object.keys(validSchema) as Array<keyof typeof validSchema>);
 
-        // Compile schema to Joi schema object and validate the request object
-        const { value, error } = Joi.compile(validSchema)
-            .prefs({ errors: { label: "key" } })
-            .validate(object);
-
-        if (error) {
-            console.log("🚀 ~ validate ~ error:", req.body, req.files, error);
-        }
-
-        // If validation fails, throw 400 Bad Request error
-        if (error) {
-            // cleanup files buffer if exist upon validation failing
-            if (req.file) {
-                req.file.buffer = Buffer.from([]);
-            } else if (Array.isArray(req.files)) {
-                req.files.forEach((file) => {
-                    file.buffer = Buffer.from([]);
-                });
-            } else if (req.files && typeof req.files === "object") {
-                Object.keys(req.files).forEach((key) => {
-                    (req.files as Record<string, Express.Multer.File[]>)[key].forEach((file) => {
-                        file.buffer = Buffer.from([]);
-                    });
-                });
+        try {
+            // Validate each defined part using Zod
+            for (const key of Object.keys(validSchema) as Array<keyof typeof validSchema>) {
+                if (validSchema[key]) {
+                    const result = validSchema[key]!.parse(object[key]);
+                    Object.assign(req, { [key]: result });
+                }
             }
 
-            const errorMessage = error.details.map((details) => details.message).join(", ");
-            return next(new ApiError(httpStatus.BAD_REQUEST, errorMessage));
+            return next();
+        } catch (err) {
+            if (err instanceof ZodError) {
+                // Cleanup uploaded files if validation fails
+                if (req.file) {
+                    req.file.buffer = Buffer.from([]);
+                } else if (Array.isArray(req.files)) {
+                    req.files.forEach((file) => (file.buffer = Buffer.from([])));
+                } else if (req.files && typeof req.files === "object") {
+                    Object.keys(req.files).forEach((key) => {
+                        (req.files as Record<string, Express.Multer.File[]>)[key].forEach(
+                            (file) => (file.buffer = Buffer.from([]))
+                        );
+                    });
+                }
+
+                // ✅ Construct detailed error messages with key paths
+                const errorMessage = err.issues
+                    .map((issue) => {
+                        const path = issue.path.join(".") || "(root)";
+                        return `${path}: ${issue.message}`;
+                    })
+                    .join(", ");
+
+                return next(new ApiError(httpStatus.BAD_REQUEST, errorMessage));
+            }
+
+            return next(err);
         }
-
-        // Update validated fields in request with returned value
-        Object.assign(req, value);
-
-        return next();
     };
