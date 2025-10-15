@@ -1,10 +1,10 @@
-import Joi from "joi";
+import { z } from "zod";
 
 export const CustomSchema = {
-    dbOptionsSchema: {
-        limit: Joi.number().default(10),
-        page: Joi.number().default(1),
-        sortBy: Joi.string().default("createdAt"),
-        sortOrder: Joi.string().valid("", "asc").default(""),
-    },
+    dbOptionsSchema: z.object({
+        limit: z.number().default(10),
+        page: z.number().default(1),
+        sortBy: z.string().default("createdAt"),
+        sortOrder: z.enum(["", "asc"]).default(""),
+    }),
 };
