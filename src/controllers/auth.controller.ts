@@ -20,6 +20,6 @@ export class AuthController {
     });
 
     static login = asyncHandler(async (req: AuthRequest, res: Response) => {
-        return sendResponse(res, httpStatus.OK, req.user, "User registered successfully");
+        return sendResponse(res, httpStatus.OK, req.user, "User logged in successfully");
     });
 }
