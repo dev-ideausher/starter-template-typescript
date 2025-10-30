@@ -7,7 +7,9 @@
     "scripts": {
         "dev": "concurrently -k -n TSC,ALIAS,NODE -c yellow,cyan,green \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/index.js\"",
         "build": "tsc && tsc-alias",
-        "start": "node dist/index.js"
+        "start": "node dist/index.js",
+        "lint:check": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.890.0",
@@ -48,12 +50,17 @@
         "@typescript-eslint/parser": "^8.44.0",
         "concurrently": "^9.2.1",
         "eslint": "^9.35.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-import-resolver-typescript": "^4.4.4",
+        "eslint-plugin-import": "^2.32.0",
+        "globals": "^16.4.0",
         "nodemon": "^3.1.10",
         "rimraf": "^6.0.1",
         "ts-node": "^10.9.1",
         "tsc-alias": "^1.8.16",
         "tsconfig-paths": "^4.2.0",
-        "typescript": "^5.1.6"
+        "typescript": "^5.1.6",
+        "typescript-eslint": "^8.46.2"
     },
     "overrides": {
         "glob": "^10.4.2",

@@ -56,7 +56,9 @@ export class S3Service {
         } catch (error) {
             try {
                 if (localFilePath) await fs.unlink(localFilePath);
-            } catch {}
+            } catch (error) {
+                throw error;
+            }
             console.error("Error while uploading to S3", error);
             throw new ApiError(500, "Failed to upload file to S3");
         }

@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 const asyncHandler = <T>(
     requestHandler: (req: Request, res: Response, next: NextFunction) => Promise<T>
 ) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        Promise.resolve(requestHandler(req, res, next)).catch(next);
+    return (_req: Request, _res: Response, _next: NextFunction) => {
+        Promise.resolve(requestHandler(_req, _res, _next)).catch(_next);
     };
 };
 

@@ -319,7 +319,7 @@ const existingFiles = Object.entries(files).filter(([, filePath]) => fs.existsSy
 
 if (existingFiles.length > 0) {
     console.log("⚠️  The following files already exist:");
-    existingFiles.forEach(([type, filePath]) =>
+    existingFiles.forEach(([_, filePath]) =>
         console.log(`   - ${path.relative(process.cwd(), filePath)}`)
     );
     process.exit(1);

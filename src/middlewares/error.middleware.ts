@@ -7,7 +7,7 @@ const errorHandler: ErrorRequestHandler = (
     err: unknown,
     req: Request,
     res: Response,
-    next: NextFunction
+    _: NextFunction
 ) => {
     let error: any = err as ApiError;
 

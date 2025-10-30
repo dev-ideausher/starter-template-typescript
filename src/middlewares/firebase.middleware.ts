@@ -6,14 +6,6 @@ import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import { ParsedQs } from "qs";
 
-declare module "express-serve-static-core" {
-    interface Request {
-        user?: IUser;
-        newUser?: admin.auth.DecodedIdToken;
-        routeType?: string;
-    }
-}
-
 export interface AuthRequest<T = any, U extends ParsedQs = ParsedQs> extends Request {
     user?: IUser | IClient | IAdmin;
     newUser?: admin.auth.DecodedIdToken;
@@ -32,7 +24,7 @@ export interface CustomRequest<T = any, U extends ParsedQs = ParsedQs> extends R
 
 export const firebaseAuth =
     (allowUserType: string = "All") =>
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             const token = req.header("Authorization")?.split(" ")[1];
 

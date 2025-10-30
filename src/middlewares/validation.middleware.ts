@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { z, ZodError, ZodObject } from "zod";
+import { ZodError, ZodObject } from "zod";
 import httpStatus from "http-status";
 import { ApiError, pick } from "@utils";
 
