@@ -1,10 +1,11 @@
+import httpStatus from "http-status";
+
 import { admin, S3Folders, userTypes } from "@config";
 import { S3Service } from "@microservices";
 import { IClient, IAdmin, IUser } from "@models";
 import { UserRepository } from "@repositories";
 import { RegisterRequest } from "@types";
 import { ApiError } from "@utils";
-import httpStatus from "http-status";
 
 const createNewUserObject = (newUser: admin.auth.DecodedIdToken) => ({
     email: newUser.email,

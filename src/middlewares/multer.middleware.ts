@@ -2,6 +2,7 @@ import multer, { FileFilterCallback, StorageEngine } from "multer";
 import { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import httpStatus from "http-status";
+
 import { ApiError } from "@utils";
 import { fileTypes, config } from "@config";
 
@@ -20,7 +21,7 @@ const storage: StorageEngine = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname + "-" + uuidv4());
+        cb(null, `${file.originalname  }-${  uuidv4()}`);
     },
 });
 

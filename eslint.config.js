@@ -40,9 +40,20 @@ export default defineConfig([
             "no-return-assign": 0,
             quotes: ["error", "single"],
 
+            "no-unused-vars": "off",
+            "no-undef": "off",
+
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-namespace": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
+                },
+            ],
 
             "import/no-unresolved": 0,
             "import/order": [

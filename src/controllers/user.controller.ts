@@ -1,8 +1,9 @@
+import { Response, Request } from "express";
+import httpStatus from "http-status";
+
 import { AuthRequest } from "@middlewares";
 import { UserService } from "@services";
 import { asyncHandler, sendResponse } from "@utils";
-import { Response, Request } from "express";
-import httpStatus from "http-status";
 
 export class UserController {
     static checkUsername = asyncHandler(async (req: Request, res: Response) => {
