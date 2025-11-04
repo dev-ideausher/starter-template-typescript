@@ -71,5 +71,15 @@ export default defineConfig([
             },
         },
     },
+    {
+        files: ["dist/**/*.js"],
+        languageOptions: {
+            ecmaVersion: 2020,
+            sourceType: "module",
+            globals: {
+                ...globals.node,
+            },
+        },
+    },
     prettier,
 ]);
