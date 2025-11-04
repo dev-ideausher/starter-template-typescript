@@ -1,6 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
+
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 import { ApiError } from "@utils";
 import { config } from "@config";
 
@@ -54,11 +56,7 @@ export class S3Service {
             console.log("File uploaded", result.url);
             return result;
         } catch (error) {
-            try {
-                if (localFilePath) await fs.unlink(localFilePath);
-            } catch (error) {
-                throw error;
-            }
+            if (localFilePath) await fs.unlink(localFilePath);
             console.error("Error while uploading to S3", error);
             throw new ApiError(500, "Failed to upload file to S3");
         }

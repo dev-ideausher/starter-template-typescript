@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+
 import { DatabaseHealth } from "@types";
+
 import config from "./config.js";
 
 export const connectDB = async (): Promise<void> => {

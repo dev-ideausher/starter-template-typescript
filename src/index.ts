@@ -1,10 +1,14 @@
 // import "module-alias/register.js";
-import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import app from "./app.js";
+
+import dotenv from "dotenv";
+
 import { connectDB } from "@config";
+
+import app from "./app.js";
+
 
 dotenv.config();
 

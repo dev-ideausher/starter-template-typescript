@@ -1,6 +1,7 @@
+import os from 'os';
+
 import { HealthCheckResponse } from "@types";
 import { config, checkDatabaseHealth } from "@config";
-import os from 'os';
 // DONT CHANGE THIS FILE
 
 // Helper function to get memory usage

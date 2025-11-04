@@ -1,5 +1,6 @@
 import { Response } from "express";
 import httpStatus from "http-status";
+
 import { AuthRequest } from "@middlewares";
 import { AuthService } from "@services";
 import { RegisterRequest } from "@types";

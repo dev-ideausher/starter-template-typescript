@@ -1,10 +1,11 @@
+import { Request, Response, NextFunction } from "express";
+import httpStatus from "http-status";
+import { ParsedQs } from "qs";
+
 import { admin } from "@config";
 import { IUser, IClient, IAdmin } from "@models";
 import { AuthService } from "@services";
 import { ApiError } from "@utils";
-import { Request, Response, NextFunction } from "express";
-import httpStatus from "http-status";
-import { ParsedQs } from "qs";
 
 export interface AuthRequest<T = any, U extends ParsedQs = ParsedQs> extends Request {
     user?: IUser | IClient | IAdmin;
@@ -25,64 +26,53 @@ export interface CustomRequest<T = any, U extends ParsedQs = ParsedQs> extends R
 export const firebaseAuth =
     (allowUserType: string = "All") =>
     async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
+        try {
             const token = req.header("Authorization")?.split(" ")[1];
 
-            // No token
             if (!token) {
-                return reject(new ApiError(httpStatus.BAD_REQUEST, "Please Authenticate!"));
+                throw new ApiError(httpStatus.BAD_REQUEST, "Please Authenticate!");
             }
 
-            try {
-                const payload = await admin.auth().verifyIdToken(token, true);
-                const user = await AuthService.getUserByFirebaseUid(payload.uid);
+            const payload = await admin.auth().verifyIdToken(token, true);
+            const user = await AuthService.getUserByFirebaseUid(payload.uid);
 
-                if (!user) {
-                    // Allow registration routes
-                    if (["/register"].includes(req.path) || req.path.includes("secret-register")) {
-                        req.newUser = payload;
-                        req.routeType = allowUserType;
-                    } else {
-                        return reject(
-                            new ApiError(
-                                httpStatus.NOT_FOUND,
-                                "User doesn't exist. Please create account"
-                            )
-                        );
-                    }
+            if (!user) {
+                if (["/register"].includes(req.path) || req.path.includes("secret-register")) {
+                    req.newUser = payload;
+                    req.routeType = allowUserType;
                 } else {
-                    // Restrict user type if needed
-                    if (!allowUserType.split(",").includes(user.__t) && allowUserType !== "All") {
-                        return reject(
-                            new ApiError(httpStatus.FORBIDDEN, "Sorry, but you can't access this")
-                        );
-                    }
-
-                    if (user.__t === "Client") {
-                        const client = user as IClient;
-                        if (client.isBlocked) {
-                            return reject(new ApiError(httpStatus.FORBIDDEN, "User is blocked"));
-                        }
-
-                        if (client.isDeleted) {
-                            return reject(
-                                new ApiError(httpStatus.GONE, "User doesn't exist anymore")
-                            );
-                        }
-                    }
-
-                    req.user = user;
+                    throw new ApiError(
+                        httpStatus.NOT_FOUND,
+                        "User doesn't exist. Please create account"
+                    );
+                }
+            } else {
+                if (!allowUserType.split(",").includes(user.__t) && allowUserType !== "All") {
+                    throw new ApiError(httpStatus.FORBIDDEN, "Sorry, but you can't access this");
                 }
 
-                resolve();
-            } catch (err: any) {
-                if (err.code === "auth/id-token-expired") {
-                    return reject(new ApiError(httpStatus.UNAUTHORIZED, "Session is expired"));
+                if (user.__t === "Client") {
+                    const client = user as IClient;
+
+                    if (client.isBlocked) {
+                        throw new ApiError(httpStatus.FORBIDDEN, "User is blocked");
+                    }
+
+                    if (client.isDeleted) {
+                        throw new ApiError(httpStatus.GONE, "User doesn't exist anymore");
+                    }
                 }
-                console.error("FirebaseAuthError:", err);
-                reject(new ApiError(httpStatus.UNAUTHORIZED, "Failed to authenticate"));
+
+                req.user = user;
             }
-        })
-            .then(() => next())
-            .catch((err) => next(err));
+
+            next();
+        } catch (err: any) {
+            if (err.code === "auth/id-token-expired") {
+                return next(new ApiError(httpStatus.UNAUTHORIZED, "Session is expired"));
+            }
+
+            console.error("FirebaseAuthError:", err);
+            next(new ApiError(httpStatus.UNAUTHORIZED, "Failed to authenticate"));
+        }
     };

@@ -245,7 +245,7 @@ function updateIndexFile(indexFilePath: string, className: string, fileName: str
 
     // If not already imported, add it
     if (!content.includes(importLine)) {
-        content = importLine + "\n" + content;
+        content = `${importLine  }\n${  content}`;
     }
 
     // Ensure it's in the export block
@@ -280,7 +280,7 @@ function updateModelIndexFile(indexFilePath: string, className: string, fileName
 
     // If not already imported, add it
     if (!content.includes(importLine)) {
-        content = importLine + "\n" + content;
+        content = `${importLine  }\n${  content}`;
     }
 
     // Ensure it's in the export block

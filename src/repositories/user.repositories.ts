@@ -1,5 +1,6 @@
-import { Admin, Client, IAdmin, IClient, IUser, User } from "@models";
 import { FilterQuery, UpdateQuery } from "mongoose";
+
+import { Admin, Client, IAdmin, IClient, IUser, User } from "@models";
 
 export class UserRepository {
     static async findOne(filter: FilterQuery<IUser>): Promise<IUser | null> {
