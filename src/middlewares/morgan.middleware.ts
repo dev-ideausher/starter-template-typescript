@@ -1,5 +1,5 @@
-import morgan, { StreamOptions } from "morgan";
 import { Request, Response } from "express";
+import morgan, { StreamOptions } from "morgan";
 
 import { config, logger } from "@config";
 

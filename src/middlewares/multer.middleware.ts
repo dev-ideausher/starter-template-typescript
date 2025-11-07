@@ -1,10 +1,10 @@
-import multer, { FileFilterCallback, StorageEngine } from "multer";
 import { Request } from "express";
-import { v4 as uuidv4 } from "uuid";
 import httpStatus from "http-status";
+import multer, { FileFilterCallback, StorageEngine } from "multer";
+import { v4 as uuidv4 } from "uuid";
 
-import { ApiError } from "@utils";
 import { fileTypes, config } from "@config";
+import { ApiError } from "@utils";
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
     if (fileTypes.includes(file.mimetype)) {

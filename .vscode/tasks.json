@@ -1,0 +1,142 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: dev",
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": ["$tsc-watch"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "isBackground": true
+    },
+    {
+      "label": "npm: build",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": ["$tsc"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "npm: start",
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "npm: lint:check",
+      "type": "npm",
+      "script": "lint:check",
+      "problemMatcher": ["$eslint-stylish"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "npm: lint:fix",
+      "type": "npm",
+      "script": "lint:fix",
+      "problemMatcher": ["$eslint-stylish"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Docker: Start Services",
+      "type": "shell",
+      "command": "docker-compose up -d",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: Stop Services",
+      "type": "shell",
+      "command": "docker-compose down",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: Start Dev Environment",
+      "type": "shell",
+      "command": "docker-compose up app-dev",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: Build Production Image",
+      "type": "shell",
+      "command": "docker build -t starter-app:latest -f Dockerfile .",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: Build Dev Image",
+      "type": "shell",
+      "command": "docker build -t starter-app:dev -f Dockerfile.dev .",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: View Logs",
+      "type": "shell",
+      "command": "docker-compose logs -f",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker: Clean Up",
+      "type": "shell",
+      "command": "docker-compose down -v --remove-orphans",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    }
+  ]
+}
+

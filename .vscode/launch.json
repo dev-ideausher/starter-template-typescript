@@ -1,0 +1,62 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: Current TS File",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-r", "ts-node/register", "-r", "tsconfig-paths/register"],
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug: App (Development)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug: Start Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [],
+      "program": "${workspaceFolder}/dist/index.js",
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "npm: build",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug: Attach to Process",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
+
