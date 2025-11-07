@@ -10,6 +10,7 @@ This is a TypeScript starter template for building backend applications with Exp
 -   TypeScript for type safety and better development experience.
 -   Configurable settings for different environments.
 -   **OpenAPI/Swagger documentation** - Interactive API documentation with Swagger UI.
+-   **Docker support** - Complete Docker setup with development and production configurations, including MongoDB and Redis services.
 
 ## Getting Started
 
@@ -39,6 +40,8 @@ This is a TypeScript starter template for building backend applications with Exp
 
 ### Running the Application
 
+#### Local Development (without Docker)
+
 To start the application in development mode, run:
 
 ```
@@ -54,6 +57,67 @@ npm start
 ```
 
 This will compile the TypeScript files and start the Express server.
+
+#### Docker Development
+
+**Prerequisites:**
+- Docker Desktop installed and running
+- Docker Compose v3.8 or higher
+
+**Start Development Environment:**
+
+```bash
+# Start all services (MongoDB, Redis, and the app in dev mode)
+docker-compose up -d
+
+# Or start only the development app (with hot reload)
+docker-compose up app-dev
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+**Build and Run Production:**
+
+```bash
+# Build production image
+docker build -t starter-app:latest -f Dockerfile .
+
+# Or use docker-compose with production profile
+docker-compose --profile production -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+**Docker Services:**
+- **MongoDB**: Available at `localhost:27017`
+- **Redis**: Available at `localhost:6379`
+- **App (Dev)**: Available at `http://localhost:8000`
+- **App (Prod)**: Available at `http://localhost:8000`
+
+**Useful Docker Commands:**
+```bash
+# View running containers
+docker-compose ps
+
+# View logs for specific service
+docker-compose logs -f app-dev
+
+# Rebuild containers
+docker-compose up -d --build
+
+# Clean up (removes volumes)
+docker-compose down -v
+
+# Execute commands in container
+docker-compose exec app-dev sh
+```
+
+**Note:** Make sure your `.env` file is configured with the correct MongoDB URI for Docker:
+```
+MONGODB_URI=mongodb://mongodb:27017
+```
 
 ### API Documentation
 

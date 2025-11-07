@@ -1,3 +1,5 @@
+import { Router } from "express";
+
 import { userTypes } from "@config";
 import { UserController } from "@controllers";
 import {
@@ -6,7 +8,6 @@ import {
     validate
 } from "@middlewares";
 import { UserSchema } from "@validators";
-import { Router } from "express";
 
 const router = Router();
 
