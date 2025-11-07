@@ -224,31 +224,182 @@ const options: swaggerJsdoc.Options = {
                     properties: {
                         status: {
                             type: "string",
-                            enum: ["healthy", "unhealthy"],
+                            enum: ["healthy", "degraded", "unhealthy"],
                             example: "healthy",
+                            description: "Overall health status of the system",
+                        },
+                        message: {
+                            type: "string",
+                            example: "Backend is running smoothly",
+                            description: "Human-readable health status message",
                         },
                         timestamp: {
                             type: "string",
                             format: "date-time",
+                            example: "2024-01-15T10:30:00.000Z",
+                            description: "ISO timestamp of the health check",
+                        },
+                        responseTime: {
+                            type: "string",
+                            example: "15ms",
+                            description: "Time taken to perform the health check",
+                        },
+                        environment: {
+                            type: "string",
+                            example: "development",
+                            description: "Current environment (development, production, test)",
                         },
                         uptime: {
-                            type: "number",
-                            example: 3600,
+                            type: "string",
+                            example: "2h 30m 45s",
+                            description: "Server uptime in human-readable format",
                         },
-                        database: {
+                        checks: {
                             type: "object",
+                            description: "Health checks for various components",
                             properties: {
-                                status: {
-                                    type: "string",
-                                    example: "healthy",
+                                database: {
+                                    type: "object",
+                                    properties: {
+                                        status: {
+                                            type: "string",
+                                            enum: ["healthy", "unhealthy"],
+                                            example: "healthy",
+                                        },
+                                        state: {
+                                            type: "string",
+                                            enum: ["connected", "disconnected", "connecting", "disconnecting", "error"],
+                                            example: "connected",
+                                        },
+                                        responseTime: {
+                                            type: "string",
+                                            example: "5ms",
+                                        },
+                                        name: {
+                                            type: "string",
+                                            example: "myapp_db",
+                                        },
+                                        host: {
+                                            type: "string",
+                                            example: "localhost",
+                                        },
+                                        port: {
+                                            type: "number",
+                                            example: 27017,
+                                        },
+                                        error: {
+                                            type: "string",
+                                            description: "Error message if database check failed",
+                                        },
+                                    },
                                 },
-                                state: {
-                                    type: "string",
-                                    example: "connected",
+                            },
+                        },
+                        process: {
+                            type: "object",
+                            description: "Process information",
+                            properties: {
+                                pid: {
+                                    type: "number",
+                                    example: 12345,
+                                    description: "Process ID",
                                 },
-                                responseTime: {
+                                memory: {
+                                    type: "object",
+                                    properties: {
+                                        rss: {
+                                            type: "string",
+                                            example: "150MB",
+                                            description: "Resident Set Size",
+                                        },
+                                        heapTotal: {
+                                            type: "string",
+                                            example: "50MB",
+                                        },
+                                        heapUsed: {
+                                            type: "string",
+                                            example: "30MB",
+                                        },
+                                        external: {
+                                            type: "string",
+                                            example: "5MB",
+                                        },
+                                        arrayBuffers: {
+                                            type: "string",
+                                            example: "2MB",
+                                        },
+                                    },
+                                },
+                                nodeVersion: {
                                     type: "string",
-                                    example: "5ms",
+                                    example: "v22.16.0",
+                                },
+                            },
+                        },
+                        system: {
+                            type: "object",
+                            description: "System information (only in detailed mode)",
+                            properties: {
+                                platform: {
+                                    type: "string",
+                                    example: "win32",
+                                },
+                                arch: {
+                                    type: "string",
+                                    example: "x64",
+                                },
+                                cpuCount: {
+                                    type: "number",
+                                    example: 8,
+                                },
+                                totalMemory: {
+                                    type: "string",
+                                    example: "16GB",
+                                },
+                                freeMemory: {
+                                    type: "string",
+                                    example: "8GB",
+                                },
+                                usedMemory: {
+                                    type: "string",
+                                    example: "8GB",
+                                },
+                                memoryUsage: {
+                                    type: "string",
+                                    example: "50%",
+                                },
+                                uptime: {
+                                    type: "string",
+                                    example: "2h 30m",
+                                },
+                                loadAverage: {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                    },
+                                    example: ["1.25", "1.50", "1.75"],
+                                },
+                            },
+                        },
+                        detailed: {
+                            type: "object",
+                            description: "Detailed health information (only when ?detailed=true)",
+                            properties: {
+                                cpuUsage: {
+                                    type: "object",
+                                    properties: {
+                                        user: {
+                                            type: "number",
+                                            example: 1234567,
+                                        },
+                                        system: {
+                                            type: "number",
+                                            example: 987654,
+                                        },
+                                    },
+                                },
+                                resourceUsage: {
+                                    description: "Resource usage statistics",
                                 },
                             },
                         },
