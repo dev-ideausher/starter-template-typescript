@@ -1,8 +1,11 @@
 import { Router } from "express";
 
-import { userTypes } from "@config";
 import { UserController } from "@controllers";
-import { validate, firebaseAuth, upload } from "@middlewares";
+import {
+    // firebaseAuth,
+    upload,
+    validate
+} from "@middlewares";
 import { UserSchema } from "@validators";
 
 const router = Router();
@@ -15,7 +18,7 @@ router.get(
 
 router.patch(
     "/updateDetails",
-    firebaseAuth(userTypes.ALL),
+    // firebaseAuth(userTypes.ALL),
     upload.single("avatar"),
     validate(UserSchema.editProfile),
     UserController.updateUser

@@ -9,6 +9,7 @@ This is a TypeScript starter template for building backend applications with Exp
 -   Modular architecture with separate folders for config, controllers, middleware, models, routes, services, microservices, validators, types and utils.
 -   TypeScript for type safety and better development experience.
 -   Configurable settings for different environments.
+-   **OpenAPI/Swagger documentation** - Interactive API documentation with Swagger UI.
 
 ## Getting Started
 
@@ -53,6 +54,25 @@ npm start
 ```
 
 This will compile the TypeScript files and start the Express server.
+
+### API Documentation
+
+The project includes interactive API documentation powered by Swagger/OpenAPI.
+
+**Access the API documentation:**
+- After starting the server, navigate to: `http://localhost:8000/api-docs`
+- The Swagger UI provides an interactive interface to explore and test all API endpoints
+- All endpoints are documented with request/response schemas, authentication requirements, and examples
+
+**Features:**
+- Complete OpenAPI 3.0 specification
+- Interactive API testing directly from the browser
+- Authentication support (Firebase Bearer tokens)
+- Request/response schema validation
+- Example requests and responses
+
+**Adding Documentation to New Endpoints:**
+Add JSDoc comments with `@swagger` annotations above your route handlers. See `src/routes/v1/auth.routes.ts` for examples.
 
 ### Directory Structure
 
