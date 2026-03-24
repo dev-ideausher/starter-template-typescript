@@ -23,8 +23,11 @@ function generateKey(folder: string, fileName: string, visibility: boolean): str
     return `${visibility ? "private" : "public"}/${folder}/${fileName}`;
 }
 
+import { Service } from "typedi";
+
+@Service()
 export class S3Service {
-    static uploadOnS3 = async (
+    uploadOnS3 = async (
         localFilePath: string,
         folder: string,
         visibility: boolean = false
@@ -62,7 +65,7 @@ export class S3Service {
         }
     };
 
-    static deleteFromS3 = async (key: string): Promise<{ success: boolean }> => {
+    deleteFromS3 = async (key: string): Promise<{ success: boolean }> => {
         try {
             if (!key) return { success: false };
 

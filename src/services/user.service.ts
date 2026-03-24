@@ -7,39 +7,58 @@ import { UserRepository } from "@repositories";
 import { UpdateUserRequest } from "@types";
 import { ApiError } from "@utils";
 
+import { Service } from "typedi";
+
+@Service()
 export class UserService {
-    static async checkIfUsernameExists(username: string): Promise<boolean> {
-        const existingUsername = await UserRepository.findOne({ username });
-        return !existingUsername;
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly s3Service: S3Service,
+  ) {}
+
+  async checkIfUsernameExists(username: string): Promise<boolean> {
+    const existingUsername = await this.userRepository.findOne({ username });
+    return !existingUsername;
+  }
+
+  async updateUser(
+    user: IUser,
+    payload: UpdateUserRequest,
+    profilePic: string | undefined,
+  ): Promise<IUser> {
+    const existingUser = await this.userRepository.findOne({
+      username: payload.username,
+    });
+    if (existingUser) {
+      throw new ApiError(httpStatus.CONFLICT, "Username not available");
     }
 
-    static async updateUser(
-        user: IUser,
-        payload: UpdateUserRequest,
-        profilePic: string | undefined
-    ): Promise<IUser> {
-        const existingUser = await UserRepository.findOne({ username: payload.username });
-        if (existingUser) {
-            throw new ApiError(httpStatus.CONFLICT, "Username not available");
-        }
+    let updates = { ...payload };
+    if (profilePic) {
+      const uploadedImage = await this.s3Service.uploadOnS3(
+        profilePic,
+        S3Folders.profilePics,
+      );
 
-        let updates = { ...payload };
-        if (profilePic) {
-            const uploadedImage = await S3Service.uploadOnS3(S3Folders.profilePics, profilePic);
+      if (user.avatar) {
+        await this.s3Service.deleteFromS3(user.avatar.id);
+      }
 
-            if (user.avatar) {
-                await S3Service.deleteFromS3(user.avatar.id);
-            }
-
-            if (uploadedImage) {
-                updates = { ...updates, ...uploadedImage };
-            }
-        }
-
-        const updatedUser = await UserRepository.findByIdAndUpdate(user!._id, updates);
-        if (!updatedUser) {
-            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
-        }
-        return updatedUser;
+      if (uploadedImage) {
+        updates = { ...updates, ...uploadedImage };
+      }
     }
+
+    const updatedUser = await this.userRepository.findByIdAndUpdate(
+      user!._id,
+      updates,
+    );
+    if (!updatedUser) {
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        "Internal server error",
+      );
+    }
+    return updatedUser;
+  }
 }

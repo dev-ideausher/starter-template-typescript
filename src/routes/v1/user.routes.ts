@@ -1,12 +1,8 @@
 import { Router } from "express";
 
 import { userTypes } from "@config";
-import { UserController } from "@controllers";
-import {
-    firebaseAuth,
-    upload,
-    validate
-} from "@middlewares";
+import { userController } from "@controllers";
+import { validate, firebaseAuth, upload } from "@middlewares";
 import { UserSchema } from "@validators";
 
 const router = Router();
@@ -56,9 +52,9 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.get(
-    "/username-available/:username",
-    validate(UserSchema.checkUsername),
-    UserController.checkUsername
+  "/username-available/:username",
+  validate(UserSchema.checkUsername),
+  userController.checkUsername,
 );
 
 /**
@@ -137,11 +133,11 @@ router.get(
  *               $ref: '#/components/schemas/Error'
  */
 router.patch(
-    "/updateDetails",
-    firebaseAuth(userTypes.ALL),
-    upload.single("avatar"),
-    validate(UserSchema.editProfile),
-    UserController.updateUser
+  "/updateDetails",
+  firebaseAuth(userTypes.ALL),
+  upload.single("avatar"),
+  validate(UserSchema.editProfile),
+  userController.updateUser,
 );
 
 export default router;

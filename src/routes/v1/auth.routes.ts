@@ -1,11 +1,8 @@
-import { Router } from "express";
-
-import { AuthController } from "@controllers";
-import {
-    // firebaseAuth,
-    upload, validate
-} from "@middlewares";
+import { userTypes } from "@config";
+import { authController } from "@controllers";
+import { firebaseAuth, upload, validate } from "@middlewares";
 import { AuthSchema } from "@validators";
+import { Router } from "express";
 
 const router = Router();
 
@@ -74,11 +71,11 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-    "/register",
-    // firebaseAuth(userTypes.CLIENT),
-    upload.single("avatar"),
-    validate(AuthSchema.register),
-    AuthController.register
+  "/register",
+  // firebaseAuth(userTypes.CLIENT),
+  upload.single("avatar"),
+  validate(AuthSchema.register),
+  authController.register,
 );
 
 /**
@@ -127,58 +124,12 @@ router.post(
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-    "/admin-secret-register",
-    // firebaseAuth(userTypes.ADMIN),
-    validate(AuthSchema.register),
-    AuthController.register
+  "/admin-secret-register",
+  // firebaseAuth(userTypes.ADMIN),
+  validate(AuthSchema.register),
+  authController.register,
 );
 
-/**
- * @swagger
- * /v1/auth/login:
- *   post:
- *     summary: Login an existing user
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     description: |
- *       Logs in an existing user (Client or Admin).
- *       The user must already exist in the database and have a valid Firebase token.
- *     responses:
- *       200:
- *         description: User logged in successfully
- *         content:
- *           application/json:
- *             schema:
- *               allOf:
- *                 - $ref: '#/components/schemas/SuccessResponse'
- *                 - type: object
- *                   properties:
- *                     data:
- *                       oneOf:
- *                         - $ref: '#/components/schemas/Client'
- *                         - $ref: '#/components/schemas/Admin'
- *       401:
- *         description: Unauthorized (invalid or expired Firebase token)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: User not found (user doesn't exist in database)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       403:
- *         description: Forbidden (user is blocked or deleted)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.post("/login", 
-    // firebaseAuth(userTypes.ALL),
-     AuthController.login);
+router.post("/login", firebaseAuth(userTypes.ALL), authController.login);
 
 export default router;

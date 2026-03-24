@@ -10,6 +10,8 @@
         "outDir": "./dist",
         "rootDir": "./src",
         "baseUrl": "./src",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "paths": {
             "@controllers": ["controllers/index.ts"],
             "@controllers/*": ["controllers/*"],
